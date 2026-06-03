@@ -44,14 +44,22 @@ export const validateMemoryRoute = (route: any): route is MemoryRoute => {
 /**
  * Validates a complete RouteLibrary object (strict v0.2 check)
  */
-export const validateRouteLibrary = (library: any): library is RouteLibrary => {
+export const validateRouteLibrary = (library: unknown): library is RouteLibrary => {
   if (!library || typeof library !== "object") return false;
-  return (
-    typeof library.version === "number" &&
-    typeof library.activeRouteId === "string" &&
-    Array.isArray(library.routes) &&
-    library.routes.every(validateMemoryRoute)
-  );
+
+  const candidate = library as Partial<RouteLibrary>;
+
+  if (
+    typeof candidate.version !== "number" ||
+    typeof candidate.activeRouteId !== "string" ||
+    !Array.isArray(candidate.routes) ||
+    candidate.routes.length === 0 ||
+    !candidate.routes.every(validateMemoryRoute)
+  ) {
+    return false;
+  }
+
+  return candidate.routes.some((route) => route.id === candidate.activeRouteId);
 };
 
 /**
