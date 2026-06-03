@@ -22,7 +22,7 @@ interface MemoryDashboardProps {
   activePin: MemoryPin | null;
   activeRoute: MemoryRoute | null;
   isPlaying: boolean;
-  mode: "view" | "edit";
+  mode: "view" | "edit" | "present";
   onPlayPauseToggle: () => void;
   onNextPin: () => void;
   onPrevPin: () => void;
@@ -88,7 +88,7 @@ export default function MemoryDashboard({
   // Playback timer simulation
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isPlaying && activePin && mode === "view") {
+    if (isPlaying && activePin && (mode === "view" || mode === "present")) {
       interval = setInterval(() => {
         setCurrentTimeSec((prev) => {
           if (prev >= totalDurationSec) {
@@ -194,7 +194,7 @@ export default function MemoryDashboard({
 
       {/* RIGHT/BOTTOM: Narrative or Creator Edit Fields */}
       <div className="flex-1 p-4 md:p-6 flex flex-col justify-between overflow-y-auto">
-        {mode === "view" ? (
+        {mode === "view" || mode === "present" ? (
           /* ================== READ/VIEW MODE ================== */
           !activePin ? (
             <div className="w-full h-full flex flex-col items-center justify-center p-6 text-stone-600 font-serif">
