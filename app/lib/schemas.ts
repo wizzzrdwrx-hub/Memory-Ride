@@ -1,13 +1,20 @@
 import { MemoryPin, MemoryRoute, RouteLibrary } from "../types";
 
 /**
- * Validates a single memory pin structure and data types
+ * Safely returns a usable string or a fallback.
+ */
+const safeString = (value: unknown, fallback: string): string => {
+  return typeof value === "string" && value.trim().length > 0 ? value : fallback;
+};
+
+/**
+ * Validates a single memory pin structure and data types.
  */
 export const validateMemoryPin = (pin: unknown): pin is MemoryPin => {
   if (!pin || typeof pin !== "object") return false;
-  
+
   const p = pin as Partial<MemoryPin>;
-  
+
   return (
     typeof p.id === "number" &&
     Number.isInteger(p.id) &&
@@ -31,15 +38,16 @@ export const validateMemoryPin = (pin: unknown): pin is MemoryPin => {
 };
 
 /**
- * Validates a complete MemoryRoute object (strict v0.2 check)
+ * Validates a complete MemoryRoute object.
  */
 export const validateMemoryRoute = (route: unknown): route is MemoryRoute => {
   if (!route || typeof route !== "object") return false;
-  
+
   const r = route as Partial<MemoryRoute>;
-  
+
   return (
     typeof r.id === "string" &&
+    r.id.trim().length > 0 &&
     typeof r.title === "string" &&
     typeof r.description === "string" &&
     typeof r.era === "string" &&
@@ -53,7 +61,7 @@ export const validateMemoryRoute = (route: unknown): route is MemoryRoute => {
 };
 
 /**
- * Validates a complete RouteLibrary object (strict v0.2 check)
+ * Validates a complete RouteLibrary object.
  */
 export const validateRouteLibrary = (library: unknown): library is RouteLibrary => {
   if (!library || typeof library !== "object") return false;
@@ -75,42 +83,52 @@ export const validateRouteLibrary = (library: unknown): library is RouteLibrary 
 
 /**
  * Normalizes imported or legacy data into a clean, valid MemoryRoute object.
- * Supports legacy flat arrays of pins, v0.1.1 route wrappers, and v0.2 routes.
+ *
+ * Supports:
+ * - strict v0.2 MemoryRoute objects
+ * - v0.1.1 route wrappers with pins
+ * - legacy v0.1 flat MemoryPin arrays
  */
 export const normalizeImportedRoute = (data: unknown): MemoryRoute | null => {
   if (!data) return null;
 
-  // 1. If it's already a strict v0.2 MemoryRoute
+  // 1. Already a valid v0.2 MemoryRoute
   if (validateMemoryRoute(data)) {
     return data;
   }
 
-  // 2. If it is a v0.1.1 MemoryRoute wrapper (with version: 1 and pins)
+  // 2. Legacy object wrapper with pins
   if (typeof data === "object") {
     const obj = data as Record<string, unknown>;
+
     if (Array.isArray(obj.pins)) {
-      const pinsArray = obj.pins as unknown[];
-      const validPins = pinsArray.filter(validateMemoryPin);
+      const validPins = obj.pins.filter(validateMemoryPin);
+
       if (validPins.length > 0) {
+        const now = new Date().toISOString();
+
         return {
-          id: (obj.id as string) || `route-${Date.now()}`,
-          title: (obj.title as string) || "Migrated Ride",
-          description: (obj.description as string) || "Story migrated from legacy format.",
+          id: safeString(obj.id, `route-${Date.now()}`),
+          title: safeString(obj.title, "Migrated Ride"),
+          description: safeString(obj.description, "Story migrated from legacy format."),
           era: validPins[0]?.year || "1994",
-          author: "Family Archivist",
-          coverImage: validPins[0]?.image || "/images/battery.png",
-          createdAt: (obj.createdAt as string) || new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          author: safeString(obj.author, "Family Archivist"),
+          coverImage: safeString(obj.coverImage, validPins[0]?.image || "/images/battery.png"),
+          createdAt: safeString(obj.createdAt, now),
+          updatedAt: now,
           pins: validPins,
         };
       }
     }
   }
 
-  // 3. If it's a legacy flat array of pins (v0.1)
+  // 3. Legacy flat pin array
   if (Array.isArray(data)) {
     const validPins = data.filter(validateMemoryPin);
+
     if (validPins.length > 0) {
+      const now = new Date().toISOString();
+
       return {
         id: `route-${Date.now()}`,
         title: "Migrated Ride (Legacy Array)",
@@ -118,8 +136,8 @@ export const normalizeImportedRoute = (data: unknown): MemoryRoute | null => {
         era: validPins[0]?.year || "1994",
         author: "Family Archivist",
         coverImage: validPins[0]?.image || "/images/battery.png",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: now,
+        updatedAt: now,
         pins: validPins,
       };
     }
