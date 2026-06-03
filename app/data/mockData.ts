@@ -1,0 +1,70 @@
+export interface MemoryPin {
+  id: number;
+  title: string;
+  coordinates: [number, number]; // [lng, lat]
+  text: string;
+  image: string;
+  locationName: string;
+  year: string;
+  audioDuration: string; // e.g., "1:45"
+}
+
+export const routeGeoJson: GeoJSON.Feature<GeoJSON.LineString> = {
+  type: "Feature",
+  properties: {
+    name: "The Battery to The Beach (1994)",
+    color: "#D97706", // Amber-600
+  },
+  geometry: {
+    type: "LineString",
+    coordinates: [
+      [-79.9261, 32.7714], // Start: East Bay Street, Charleston
+      [-79.9501, 32.7665], // Waypoint 1: James Island Expressway
+      [-79.9535, 32.7161], // Waypoint 2: Folly Road
+      [-79.9403, 32.6551], // End: 1 Center Street, Folly Beach
+    ],
+  },
+};
+
+export const memoryPins: MemoryPin[] = [
+  {
+    id: 1,
+    title: "Leaving the Battery",
+    coordinates: [-79.9261, 32.7714],
+    text: "Packing up the station wagon. The AC was already broken.",
+    image: "/images/battery.png",
+    locationName: "East Bay Street, Charleston",
+    year: "1994",
+    audioDuration: "1:24",
+  },
+  {
+    id: 2,
+    title: "Crossing the Connector",
+    coordinates: [-79.9501, 32.7665],
+    text: "Looking out over the harbor, knowing we had a week of freedom ahead.",
+    image: "/images/connector.png",
+    locationName: "James Island Expressway",
+    year: "1994",
+    audioDuration: "2:05",
+  },
+  {
+    id: 3,
+    title: "Crosby's Seafood",
+    coordinates: [-79.9535, 32.7161],
+    text: "Dad stopped to get shrimp for the boil. It smelled like salt and pluff mud.",
+    image: "/images/crosbys.png",
+    locationName: "Folly Road, Crosby's Seafood",
+    year: "1994",
+    audioDuration: "1:58",
+  },
+  {
+    id: 4,
+    title: "Arrival at Center Street",
+    coordinates: [-79.9403, 32.6551],
+    text: "We made it. 1 Center Street. You could hear the waves from the driveway.",
+    image: "/images/folly_beach.png",
+    locationName: "1 Center Street, Folly Beach",
+    year: "1994",
+    audioDuration: "3:12",
+  },
+];
