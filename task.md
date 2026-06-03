@@ -1,24 +1,29 @@
-# Task: v0.3 Media Prep
+# Task: v0.3 Light Over Time Foundation
 
-- [x] Extend media type definitions in `app/types/index.ts`:
-  - [x] Create `ImageSourceType`, `AudioSourceType` types.
-  - [x] Add `MemoryPinMedia`, `MemoryRouteMedia` structures.
-  - [x] Add optional `media` field to `MemoryPin` and `MemoryRoute`.
-  - [x] Keep legacy attributes: `MemoryPin.image`, `MemoryPin.audioDuration`, `MemoryRoute.coverImage`.
-- [x] Add validation helpers in `app/lib/schemas.ts`:
-  - [x] `validateMemoryPinMedia` schema checker.
-  - [x] `validateMemoryRouteMedia` schema checker.
-  - [x] Update `validateMemoryPin`, `validateMemoryRoute`, and `normalizeImportedRoute` to support and validate the new optional `media` structures strictly.
-- [x] Update Mock data in `app/data/mockData.ts`:
-  - [x] Add `media` block metadata to the Charleston default route and pins with default `"url"` and `"none"` source types.
-- [x] Attach default media structures on creation inside `app/page.tsx`:
-  - [x] Initialize stop media in `handleAddPin`.
-  - [x] Initialize route media in `handleCreateRoute`.
-- [x] Refactor UI elements in `app/components/MemoryDashboard.tsx`:
-  - [x] Cover image sourcing dropdown and explanation microcopy.
-  - [x] Stop image sourcing dropdown, renaming label, and explanation microcopy.
-  - [x] Stop audio settings box with audio source type selector, label string, and helper text.
-  - [x] Retain visual rendering from base fields (no file picker/microphone added).
-- [x] Quality & Compatibility Verification:
-  - [x] Run `cmd /c npm run lint` (passes with 0 errors).
-  - [x] Run `cmd /c npm run build` (passes successfully).
+- [x] Copy Crosby's Seafood uploaded era images into `public/images/`:
+  - [x] Copy `media__1780524259779.jpg` to `crosbys_1994.jpg`
+  - [x] Copy `media__1780524272169.jpg` to `crosbys_2016.jpg`
+  - [x] Copy `media__1780524272228.jpg` to `crosbys_2024.jpg`
+- [x] Extend data models in `app/types/index.ts`:
+  - [x] Define `TemporalPerspective` type.
+  - [x] Add optional `temporalPerspectives?: TemporalPerspective[]` to `MemoryPin`.
+- [x] Implement schema validation in `app/lib/schemas.ts`:
+  - [x] Implement `validateTemporalPerspective` type check.
+  - [x] Update `validateMemoryPin` to validate `temporalPerspectives` if present.
+- [x] Inject Crosby's Seafood perspectives in `app/data/mockData.ts`:
+  - [x] Setup 1994, 2016, and 2024 layers with corresponding text narrative, metadata details, and public image references.
+- [x] Wire state coordination in `app/page.tsx`:
+  - [x] Add `selectedPerspectiveId` state hook.
+  - [x] Reset selector on active pin switches.
+  - [x] Pass prop dependencies to child components.
+- [x] Update Map in `app/components/MemoryRideMap.tsx`:
+  - [x] Resolve active perspective image and title for the active stop.
+  - [x] Verify pin coordinates remain fixed.
+- [x] Update Dashboard in `app/components/MemoryDashboard.tsx`:
+  - [x] Render selector pills row for stops containing perspectives in View/Present modes.
+  - [x] Update stop metadata display (Calendar year, Stop Title, Description narrative).
+  - [x] Add perspective metadata footer detailing Source, Confidence, and Nostalgia Strength.
+  - [x] Add Selector and read-only Preview Card inside the Stop Editor in Creator Mode.
+- [x] Verification:
+  - [x] Run `cmd /c npm run lint`
+  - [x] Run `cmd /c npm run build`

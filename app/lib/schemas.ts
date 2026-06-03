@@ -1,4 +1,4 @@
-import { MemoryPin, MemoryRoute, RouteLibrary, MemoryPinMedia, MemoryRouteMedia } from "../types";
+import { MemoryPin, MemoryRoute, RouteLibrary, MemoryPinMedia, MemoryRouteMedia, TemporalPerspective } from "../types";
 
 /**
  * Safely returns a usable string or a fallback.
@@ -41,6 +41,27 @@ export const validateMemoryRouteMedia = (media: unknown): media is MemoryRouteMe
 };
 
 /**
+ * Validates the schema of a temporal perspective.
+ */
+export const validateTemporalPerspective = (tp: unknown): tp is TemporalPerspective => {
+  if (!tp || typeof tp !== "object") return false;
+
+  const t = tp as Partial<TemporalPerspective>;
+
+  return (
+    typeof t.id === "string" &&
+    typeof t.year === "string" &&
+    typeof t.label === "string" &&
+    typeof t.title === "string" &&
+    typeof t.text === "string" &&
+    typeof t.image === "string" &&
+    (t.sourceNote === undefined || typeof t.sourceNote === "string") &&
+    (t.confidence === undefined || typeof t.confidence === "string") &&
+    (t.hxStrength === undefined || (typeof t.hxStrength === "number" && !isNaN(t.hxStrength)))
+  );
+};
+
+/**
  * Validates a single memory pin structure and data types.
  */
 export const validateMemoryPin = (pin: unknown): pin is MemoryPin => {
@@ -67,7 +88,8 @@ export const validateMemoryPin = (pin: unknown): pin is MemoryPin => {
     typeof p.locationName === "string" &&
     typeof p.year === "string" &&
     typeof p.audioDuration === "string" &&
-    (p.media === undefined || validateMemoryPinMedia(p.media))
+    (p.media === undefined || validateMemoryPinMedia(p.media)) &&
+    (p.temporalPerspectives === undefined || (Array.isArray(p.temporalPerspectives) && p.temporalPerspectives.every(validateTemporalPerspective)))
   );
 };
 

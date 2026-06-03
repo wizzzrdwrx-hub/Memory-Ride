@@ -38,6 +38,8 @@ interface MemoryDashboardProps {
   onDeleteRoute: () => void;
   onExportLibrary: () => void;
   onImportLibrary: (jsonData: string) => void;
+  selectedPerspectiveId: string | null;
+  onSelectPerspective: (id: string | null) => void;
 }
 
 export default function MemoryDashboard({
@@ -60,7 +62,13 @@ export default function MemoryDashboard({
   onDeleteRoute,
   onExportLibrary,
   onImportLibrary,
+  selectedPerspectiveId,
+  onSelectPerspective,
 }: MemoryDashboardProps) {
+  const activePerspective = activePin && selectedPerspectiveId
+    ? activePin.temporalPerspectives?.find((p) => p.id === selectedPerspectiveId)
+    : null;
+
   // Simulated playback time tracking
   const [playProgress, setPlayProgress] = useState(0); // 0 to 100
   const [currentTimeSec, setCurrentTimeSec] = useState(0);
@@ -163,8 +171,12 @@ export default function MemoryDashboard({
       <div className="w-full md:w-1/3 p-4 flex items-center justify-center border-b md:border-b-0 md:border-r border-stone-200 bg-stone-100/50">
         {(() => {
           const showRoutePreview = previewSource === "route" || !activePin;
-          const previewImage = showRoutePreview ? (activeRoute?.coverImage || "") : (activePin?.image || "");
-          const previewTitle = showRoutePreview ? (activeRoute?.title || "Route Cover") : (activePin?.title || "Stop Image");
+          const previewImage = showRoutePreview 
+            ? (activeRoute?.coverImage || "") 
+            : (activePerspective ? activePerspective.image : (activePin?.image || ""));
+          const previewTitle = showRoutePreview 
+            ? (activeRoute?.title || "Route Cover") 
+            : (activePerspective ? activePerspective.title : (activePin?.title || "Stop Image"));
           const previewCaption = showRoutePreview 
             ? "Route Cover"
             : (activePin?.locationName ? activePin.locationName.split(",")[0] : `Stop #${activePin?.id}`);
@@ -219,11 +231,44 @@ export default function MemoryDashboard({
           ) : (
             <>
               <div>
+                {/* Perspective selector pills row (Only shown if perspectives exist) */}
+                {activePin.temporalPerspectives && activePin.temporalPerspectives.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2 mb-3 font-sans">
+                    <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400 mr-1">
+                      Time Layer:
+                    </span>
+                    <button
+                      onClick={() => onSelectPerspective(null)}
+                      className={`px-2.5 py-0.5 text-[9px] font-sans font-bold uppercase tracking-wider rounded-full border transition-all ${
+                        selectedPerspectiveId === null
+                          ? "bg-amber-700 border-amber-700 text-stone-50 shadow-sm"
+                          : "bg-white border-stone-200 text-stone-600 hover:text-stone-850 hover:bg-stone-100"
+                      }`}
+                    >
+                      🕰️ Base Stop
+                    </button>
+                    {activePin.temporalPerspectives.map((tp) => (
+                      <button
+                        key={tp.id}
+                        onClick={() => onSelectPerspective(tp.id)}
+                        className={`px-2.5 py-0.5 text-[9px] font-sans font-bold uppercase tracking-wider rounded-full border transition-all ${
+                          selectedPerspectiveId === tp.id
+                            ? "bg-amber-700 border-amber-700 text-stone-50 shadow-sm"
+                            : "bg-white border-stone-200 text-stone-600 hover:text-stone-850 hover:bg-stone-100"
+                        }`}
+                        title={tp.label}
+                      >
+                        {tp.year} ({tp.label.split(" ")[0]})
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {/* Metadata Row */}
                 <div className="flex items-center space-x-4 text-xs font-sans text-amber-800 font-semibold uppercase tracking-wider mb-2">
                   <span className="flex items-center">
                     <Calendar className="w-3.5 h-3.5 mr-1" />
-                    {activePin.year || "1994"}
+                    {activePerspective ? activePerspective.year : (activePin.year || "1994")}
                   </span>
                   <span className="flex items-center">
                     <MapPin className="w-3.5 h-3.5 mr-1 text-amber-600" />
@@ -232,12 +277,35 @@ export default function MemoryDashboard({
                 </div>
 
                 <h2 className="text-xl md:text-2xl font-bold text-stone-900 leading-tight mb-2 tracking-tight">
-                  {activePin.title || "Untitled Stop"}
+                  {activePerspective ? activePerspective.title : (activePin.title || "Untitled Stop")}
                 </h2>
 
                 <p className="text-stone-700 text-sm md:text-base leading-relaxed font-serif italic text-justify pr-2">
-                  {activePin.text ? `"${activePin.text}"` : "No description written yet."}
+                  {activePerspective ? `"${activePerspective.text}"` : (activePin.text ? `"${activePin.text}"` : "No description written yet.")}
                 </p>
+
+                {/* Perspective Metadata Card */}
+                {activePerspective && (
+                  <div className="mt-3 p-2 bg-amber-50/50 border border-amber-200/50 rounded text-[10px] text-amber-900 font-sans space-y-1 max-w-xl shadow-sm">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      {activePerspective.sourceNote && (
+                        <span>
+                          <span className="font-semibold text-amber-800">📷 Source:</span> {activePerspective.sourceNote}
+                        </span>
+                      )}
+                      {activePerspective.confidence && (
+                        <span>
+                          <span className="font-semibold text-amber-800">✓ Confidence:</span> {activePerspective.confidence}
+                        </span>
+                      )}
+                      {activePerspective.hxStrength !== undefined && (
+                        <span>
+                          <span className="font-semibold text-amber-800">❤️ Nostalgia Strength:</span> {(activePerspective.hxStrength * 100).toFixed(0)}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Cassette/Audio Controller Player */}
@@ -421,7 +489,62 @@ export default function MemoryDashboard({
                   Memory Stop Editor {activePin && `(Stop #${activePin.id})`}
                 </h3>
                 {activePin ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <>
+                    {/* Perspective Selector for Creator Mode Preview */}
+                    {activePin.temporalPerspectives && activePin.temporalPerspectives.length > 0 && (
+                      <div className="flex flex-wrap items-center gap-2 mb-2 font-sans">
+                        <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400 mr-1">
+                          Preview Perspective:
+                        </span>
+                        <button
+                          onClick={() => onSelectPerspective(null)}
+                          className={`px-2.5 py-0.5 text-[9px] font-sans font-bold uppercase tracking-wider rounded-full border transition-all ${
+                            selectedPerspectiveId === null
+                              ? "bg-amber-700 border-amber-700 text-stone-50 shadow-sm"
+                              : "bg-white border-stone-200 text-stone-600 hover:text-stone-850 hover:bg-stone-100"
+                          }`}
+                        >
+                          🕰️ Base Stop
+                        </button>
+                        {activePin.temporalPerspectives.map((tp) => (
+                          <button
+                            key={tp.id}
+                            onClick={() => onSelectPerspective(tp.id)}
+                            className={`px-2.5 py-0.5 text-[9px] font-sans font-bold uppercase tracking-wider rounded-full border transition-all ${
+                              selectedPerspectiveId === tp.id
+                                ? "bg-amber-700 border-amber-700 text-stone-50 shadow-sm"
+                                : "bg-white border-stone-200 text-stone-600 hover:text-stone-850 hover:bg-stone-100"
+                            }`}
+                            title={tp.label}
+                          >
+                            {tp.year} ({tp.label.split(" ")[0]})
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {activePerspective && (
+                      <div className="p-2.5 bg-amber-50/60 border border-amber-200/80 rounded space-y-1.5 text-[10px] font-sans mb-2 shadow-sm">
+                        <div className="font-bold text-amber-900 flex items-center">
+                          <span className="mr-1">👁️</span> Perspective Review Card: {activePerspective.title} ({activePerspective.year})
+                        </div>
+                        <p className="italic text-stone-700 font-serif leading-relaxed">
+                          &ldquo;{activePerspective.text}&rdquo;
+                        </p>
+                        <div className="text-[9px] text-stone-500 flex flex-wrap gap-x-3 gap-y-0.5">
+                          {activePerspective.sourceNote && <span>📷 Source: {activePerspective.sourceNote}</span>}
+                          {activePerspective.confidence && <span>✓ Confidence: {activePerspective.confidence}</span>}
+                          {activePerspective.hxStrength !== undefined && (
+                            <span>❤️ Nostalgia: {(activePerspective.hxStrength * 100).toFixed(0)}%</span>
+                          )}
+                        </div>
+                        <p className="text-[8px] text-stone-400 leading-tight">
+                          *Editing is locked on this perspective preview. Modifications to coordinates or properties below will write directly to the base stop anchor.
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="flex flex-col space-y-1">
                       <label className="font-semibold text-[11px] text-stone-600">Stop Title</label>
                       <input
@@ -567,7 +690,8 @@ export default function MemoryDashboard({
                       </p>
                     </div>
                   </div>
-                ) : (
+                </>
+              ) : (
                   <div className="p-4 bg-stone-100/50 border border-stone-300/40 rounded flex flex-col items-center justify-center text-stone-500">
                     <p className="italic text-xs mb-2">No stop selected. Add your first memory stop to begin plotting.</p>
                     <button

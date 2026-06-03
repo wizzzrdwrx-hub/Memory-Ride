@@ -16,6 +16,18 @@ export interface MemoryRouteMedia {
   coverImageAlt?: string;
 }
 
+export interface TemporalPerspective {
+  id: string;
+  year: string;
+  label: string;
+  title: string;
+  text: string;
+  image: string;
+  sourceNote?: string;
+  confidence?: string;
+  hxStrength?: number;
+}
+
 export interface MemoryPin {
   id: number;
   title: string;
@@ -26,6 +38,7 @@ export interface MemoryPin {
   year: string;
   audioDuration: string;
   media?: MemoryPinMedia;
+  temporalPerspectives?: TemporalPerspective[];
 }
 
 export interface MemoryRoute {

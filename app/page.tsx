@@ -20,6 +20,12 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [ambientStatic, setAmbientStatic] = useState<boolean>(true);
   const [mode, setMode] = useState<"view" | "edit" | "present">("view");
+  const [selectedPerspectiveId, setSelectedPerspectiveId] = useState<string | null>(null);
+
+  // Reset selected perspective when switching stops
+  useEffect(() => {
+    setSelectedPerspectiveId(null);
+  }, [activePin?.id]);
 
   const activeRoute = library.routes.find((r) => r.id === library.activeRouteId) || library.routes[0];
   const pins = activeRoute ? activeRoute.pins : [];
@@ -356,6 +362,7 @@ export default function Home() {
           mode={mode}
           onPinSelect={handlePinSelect}
           onUpdatePinCoordinates={handleUpdatePinCoordinates}
+          selectedPerspectiveId={selectedPerspectiveId}
         />
 
         {/* Floating Glassmorphic Header with Mode Controls */}
@@ -490,6 +497,8 @@ export default function Home() {
           onDeleteRoute={handleDeleteRoute}
           onExportLibrary={handleExportLibrary}
           onImportLibrary={handleImportLibrary}
+          selectedPerspectiveId={selectedPerspectiveId}
+          onSelectPerspective={setSelectedPerspectiveId}
         />
       </div>
 

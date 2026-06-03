@@ -13,6 +13,7 @@ interface MemoryRideMapProps {
   mode: "view" | "edit" | "present";
   onPinSelect: (pin: MemoryPin) => void;
   onUpdatePinCoordinates: (id: number, coordinates: [number, number]) => void;
+  selectedPerspectiveId: string | null;
 }
 
 export default function MemoryRideMap({
@@ -21,6 +22,7 @@ export default function MemoryRideMap({
   mode,
   onPinSelect,
   onUpdatePinCoordinates,
+  selectedPerspectiveId,
 }: MemoryRideMapProps) {
   const mapRef = useRef<MapRef>(null);
 
@@ -110,6 +112,12 @@ export default function MemoryRideMap({
         {/* Draw Memory Pins */}
         {pins.map((pin) => {
           const isActive = activePin?.id === pin.id;
+          const activePerspective = isActive && selectedPerspectiveId
+            ? pin.temporalPerspectives?.find((p) => p.id === selectedPerspectiveId)
+            : null;
+          const pinImage = activePerspective ? activePerspective.image : pin.image;
+          const pinTitle = activePerspective ? activePerspective.title : pin.title;
+
           return (
             <Marker
               key={pin.id}
@@ -141,10 +149,10 @@ export default function MemoryRideMap({
                   }`}
                 >
                   <div className="w-8 h-8 md:w-10 md:h-10 relative bg-stone-100 overflow-hidden flex items-center justify-center">
-                    {pin.image ? (
+                    {pinImage ? (
                       <img
-                        src={pin.image}
-                        alt={pin.title}
+                        src={pinImage}
+                        alt={pinTitle}
                         className="w-full h-full object-cover grayscale-[30%] contrast-[110%]"
                         onError={(e) => {
                           // Fallback if image URL is invalid or empty
@@ -179,7 +187,7 @@ export default function MemoryRideMap({
                 {/* Hover Tooltip */}
                 <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center z-50 pointer-events-none">
                   <div className="bg-stone-950/90 backdrop-blur-sm text-stone-100 text-xs py-1 px-2.5 rounded shadow-lg whitespace-nowrap font-serif">
-                    {pin.title || "Untitled Stop"}
+                    {pinTitle || "Untitled Stop"}
                   </div>
                   <div className="w-2 h-1 border-x-4 border-x-transparent border-t-4 border-t-stone-950/90"></div>
                 </div>
