@@ -1,4 +1,4 @@
-# Walkthrough: Memory Ride MVP (Project Opal)
+# Walkthrough: Memory Ride MVP (Project Opal) - v0.3 Media Prep
 
 ## 🎯 MVP Purpose
 Memory Ride is a proof-of-concept for turning family photos, meaningful locations, and personal narration into a shareable guided route experience. 
@@ -11,31 +11,28 @@ This demo uses a Charleston-to-Folly route to show how old memories can be organ
 The project is structured inside the `memory-ride-mvp/` folder as follows:
 
 - [package.json](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/package.json) - Contains React 19, Next.js 16, `@types/mapbox-gl`, `react-map-gl`, and `lucide-react`.
-- [mockData.ts](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/data/mockData.ts) - Stores hardcoded GeoJSON route points and the 4 default Memory Pins.
-- [MemoryRideMap.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/components/MemoryRideMap.tsx) - Manages the Mapbox map container, custom Polaroid markers, dynamic path routing, active pin dragging, and map click repositioning. Includes a UI error guard if `NEXT_PUBLIC_MAPBOX_TOKEN` is missing.
-- [MemoryDashboard.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/components/MemoryDashboard.tsx) - Renders the photo scrapbook card, location meta, tape recorder audio player, rotating cassette reels (View Mode), and form fields for editing pin attributes, adding, deleting, and importing/exporting JSON configurations (Creator Mode).
+- [mockData.ts](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/data/mockData.ts) - Stores hardcoded GeoJSON route points and the 4 default Memory Pins, now pre-populated with safe media metadata.
+- [MemoryRideMap.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/components/MemoryRideMap.tsx) - Manages the Mapbox map container, custom Polaroid markers, dynamic path routing, active pin dragging, and map click repositioning.
+- [MemoryDashboard.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/components/MemoryDashboard.tsx) - Renders the photo scrapbook card, location meta, tape recorder audio player, and form fields for editing pin attributes, adding, deleting, and importing/exporting JSON. Now updated with image and audio sourcing options and helper microcopy.
 - [page.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/page.tsx) - App shell coordinating mode switching, localStorage sync, JSON import/export streams, and CRUD handlers.
-- [globals.css](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/globals.css) - Tailwind CSS v4 directives plus URL-encoded paper noise styling.
-- [layout.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/layout.tsx) - Bootstraps the application and pre-loads Google Fonts (`Inter`, `Playfair Display`, `Lora`).
-- [.env.local](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/.env.local) - Private configuration file storing your active Mapbox token.
-- [.env.local.example](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/.env.local.example) - Shared configuration template.
+- [schemas.ts](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/lib/schemas.ts) - Validation logic and schema normalize/migration helpers. Now updated with media schema verification rules.
+- [types/index.ts](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/types/index.ts) - Global TypeScript types. Now updated with media structure definitions.
 
 ---
 
-## 📋 Current MVP Scope (Creator Mode v0.2 Complete)
-* **Mode Switching**: Dual-state toggle ("View Story" and "Creator Mode") floating inside the title card.
-* **Interactive Map Placement**: Active pins are draggable in Creator Mode. Clicking on the map surface repositions coordinates instantly.
-* **Dynamic Route Tracing**: The connecting route path automatically recalculates and bends when stops are repositioned, added, or deleted.
-* **Custom Stop Management**: Creators can add new pins and delete existing stops.
-* **Property Editors**: Form fields edit title, year, location text, narrative details, image URL, and audio duration.
-* **Route Metadata Editing**: Dedicated form fields for Route Title, Era / Year, Author, Cover Image URL, and Description positioned above the Stop Editor.
-* **Route CRUD Controls**: Full local capabilities to **Create New Route**, **Duplicate Current Route** (which deep-copies coordinates and stop properties to prevent mutation), and **Delete Current Route** with safe native confirmation checks.
-* **Real-time Polaroid Preview**: Polaroid card displays image URL previews instantly as they are typed. Automatically alternates the preview source (between route cover image and active stop photo) based on input focus.
-* **Route Portability**: Isolated buttons (`Export Current Route`, `Import Route`) to download only the active route (naming files based on the route title) or upload a route JSON (replacing/matching by route ID without wiping unrelated routes).
-* **Library Portability**: Dedicated backup controls (`Export Full Library`, `Import Full Library`) to export the entire `RouteLibrary` object (`memory_ride_library.json`) and import it with schema validation and warning/confirmation dialogs.
-* **Present Mode**: A clean distraction-free playback presentation view that hides route settings forms, stop editor text inputs, CRUD buttons, and portability file inputs, displaying only the dynamic Map, Polaroid photo, active stop narration, and cassette deck audio console.
-* **Caching & Caching Recovery**: Auto-syncs all edits to `localStorage` under `memory_ride_library` with a fallback "Reset Demo" button to reload the 1994 demo.
-* **Cassette Deck & Visual Aesthetics**: Interactive audio controller with dual rotating cassette reels.
+## 📋 Current MVP Scope (v0.3 Media Prep Complete)
+* **Media Types**: Extended models with `ImageSourceType`, `AudioSourceType`, `MemoryPinMedia`, and `MemoryRouteMedia` types, integrated optionally on routes and pins.
+* **Strict Validation**: Added `validateMemoryPinMedia` and `validateMemoryRouteMedia`. Ensures imported route files containing `media` properties are rigorously checked for matching schemas (rejecting invalid source strings), while successfully retaining backward-compatibility for legacy data missing these blocks.
+* **Mock Data Updates**: Enhanced the default Charleston route and stop nodes with base `"url"` and `"none"` configurations.
+* **Dynamic Defaults**: Initialized empty default metadata blocks on pin/route addition events inside the page manager state.
+* **Sourcing Selectors & Microcopy**:
+  * Added "Cover Image Sourcing" dropdown in Route Settings.
+  * Added "Image Sourcing" dropdown inside the Stop Editor, renamed Image URL input to "Image URL or Path", and added clear explanation text warning against pasting base64 image strings.
+  * Added a consolidated "Audio Settings" sub-form enclosing coordinate statistics, tape length sliders/inputs, an "Audio Source Type" selector dropdown, an "Audio Label / Title" text input, and explicit helper disclaimers pointing out that microphone and recording options are deferred.
+* **Present Mode**: A clean distraction-free playback presentation view that hides route settings forms, stop editor text inputs, CRUD buttons, and file portability utilities, displaying only the dynamic Map, Polaroid photo, active stop narration, and cassette deck audio console.
+* **Backwards Compatibility**: Fully preserved existing simple fields rendering behaviour (`MemoryPin.image`, `MemoryPin.audioDuration`, `MemoryRoute.coverImage`), keeping the application robust and preventing bloat inside `localStorage`.
+
+---
 
 ## 🚀 Build & Lint Status
 - **ESLint**: Completed successfully with 0 errors (and only minor Image Optimization warnings on standard img tags).
@@ -43,92 +40,22 @@ The project is structured inside the `memory-ride-mvp/` folder as follows:
 
 ---
 
-## ✅ Manual Verification Checklist
+## ✅ Media Prep QA Checklist
 
-Use this checklist after pulling the branch or reviewing the PR.
-
-### App Load
-- [ ] App loads without crashing.
-- [ ] Default Charleston Battery to Folly Beach route appears.
-- [ ] Map renders when `NEXT_PUBLIC_MAPBOX_TOKEN` is present.
-- [ ] Missing Mapbox token screen appears when token is absent.
-
-### Route Library & Selector
-- [ ] `memory_ride_library` is created in localStorage.
-- [ ] `activeRouteId` points to a valid route.
-- [ ] Active route metadata appears in the floating map header.
-- [ ] Route selector dropdown appears in the map header when more than one route exists.
-- [ ] Switching routes changes the visible pins, map center focus, and route line.
-
-### Route CRUD & Focus Preview
-- [ ] Focus-aware Polaroid preview dynamically switches to showing the Route Cover when focusing on Route Settings inputs.
-- [ ] Focus-aware Polaroid preview dynamically switches to showing the Stop Image when focusing on Stop Editor inputs.
-- [ ] Create Route spawns an empty route layout with zero stops and safely falls back to a prompt to add the first stop.
-- [ ] Duplicate Route creates a perfect copy of the active route under a new ID and title copy, maintaining fully independent pins list.
-- [ ] Delete Route prompts for confirmation. If deleting the last route, it warns and safely resets back to the default Charleston route.
-
-### Creator Mode Stops
-- [ ] Add Stop creates a new pin inside the active route.
-- [ ] Delete Stop removes only the active route’s selected pin.
-- [ ] Editing title, year, location, image, caption, and tape length persists.
-- [ ] Dragging the active pin updates its coordinates.
-- [ ] Clicking the map in Creator Mode moves the active pin.
-- [ ] Empty route / missing active pin states do not crash the app.
-
-### Import / Export
-- [ ] Export produces valid JSON.
-- [ ] Import accepts valid route/library JSON.
-- [ ] Import rejects malformed JSON.
-- [ ] Import rejects invalid coordinates.
-- [ ] Imported data does not overwrite unrelated routes unless intended.
-
-### Security
-- [ ] No hardcoded Mapbox token exists in source.
-- [ ] `.env.local` is ignored.
-- [ ] `.env.local.example` contains only a placeholder.
-- [ ] Image fallbacks work with empty or broken image URLs.
-
----
-
-## ⚠️ Known Limitations
-
-The following features are intentionally not implemented yet:
-
-- Microphone recording
-- Audio file storage
-- Backend database
-- User authentication
-- Hosted media storage
-- Public/private share links
-- Collaboration permissions
-
-This release keeps the app local-first and frontend-only. The goal is to stabilize the multi-route architecture before adding media capture, sharing, or cloud persistence.
-
----
-
-## 🧭 Next Recommended Slice: Local Image Attachments / Assets Management
-The next development branch can target local asset management (like local image uploads via base64 encoding or file selector integrations) to replace hardcoded image URL strings.
-
----
-
-## 💼 Investor Demo Framing
-When pitching the MVP prototype to stakeholders, use this narrative outline:
-1. **The Vision**: *"Memory Ride is a storytelling engine. We link travel memories with physical route lines, enabling you to play back old road trips as interactive media scrapbooks."*
-2. **Showcase View Mode**: Play the cassette recorder, observe the reels spin, and click markers to watch the camera fly down the Charleston expressway.
-3. **Showcase Creator Mode**: Toggle into Creator Mode. Drag the active marker over the map or click somewhere new, showing how the route path dynamically shifts to connect the pins.
-4. **Demonstrate Route CRUD & Customization**: Create a new route, add stops, or duplicate an existing one to show how easy it is to manage multiple separate storyboards.
-5. **Demonstrate Portability**: Edit a title, show the real-time polaroid photo preview, and export the file: *"Every ride is fully portable — download it as a single JSON file and mail it to a friend, who can drop it right in."*
-
----
-
-## ⚙️ How to Setup & Run
-1. Verify that your root directory has both `.env.local` and `.gitignore` correctly set up to block environmental token leaks.
-2. Install npm dependencies (if not already done):
-   ```bash
-   npm install
-   ```
-3. Start the local server:
-   ```bash
-   npm run dev
-   ```
-4. Access the web app at [http://localhost:3000](http://localhost:3000).
+- [x] Existing default route loads.
+- [x] Existing old routes without media fields still validate and load.
+- [x] New routes include safe default media metadata.
+- [x] Route metadata editing still works.
+- [x] Stop editing still works.
+- [x] Image URL/path preview still works.
+- [x] Invalid media source type values are rejected during import.
+- [x] Exported route JSON includes media metadata when present.
+- [x] Imported route JSON with valid media metadata succeeds.
+- [x] Imported route JSON without media metadata still succeeds.
+- [x] No file picker was added.
+- [x] No blob URLs are stored.
+- [x] No base64 media storage was added.
+- [x] No microphone APIs were added.
+- [x] No backend/auth/storage dependency was added.
+- [x] `cmd /c npm run lint` passes.
+- [x] `cmd /c npm run build` passes.

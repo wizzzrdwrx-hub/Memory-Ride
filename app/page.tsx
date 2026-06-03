@@ -132,6 +132,10 @@ export default function Home() {
       locationName: "New stop along the ride",
       year: activeRoute?.era || "1994",
       audioDuration: "1:00",
+      media: {
+        imageSourceType: "url",
+        audioSourceType: "none",
+      },
     };
 
     const newPinsList = [...pins, newPin];
@@ -262,6 +266,9 @@ export default function Home() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       pins: [],
+      media: {
+        coverImageSourceType: "url",
+      },
     };
     const updatedLibrary = {
       version: 2,

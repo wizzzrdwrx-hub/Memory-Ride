@@ -1,3 +1,21 @@
+export type ImageSourceType = "url" | "local-preview" | "future-upload";
+export type AudioSourceType = "none" | "future-recording" | "future-upload";
+
+export interface MemoryPinMedia {
+  imageUrl?: string;
+  imageSourceType?: ImageSourceType;
+  imageAlt?: string;
+  audioLabel?: string;
+  audioDuration?: string;
+  audioSourceType?: AudioSourceType;
+}
+
+export interface MemoryRouteMedia {
+  coverImageUrl?: string;
+  coverImageSourceType?: ImageSourceType;
+  coverImageAlt?: string;
+}
+
 export interface MemoryPin {
   id: number;
   title: string;
@@ -7,6 +25,7 @@ export interface MemoryPin {
   locationName: string;
   year: string;
   audioDuration: string;
+  media?: MemoryPinMedia;
 }
 
 export interface MemoryRoute {
@@ -19,6 +38,7 @@ export interface MemoryRoute {
   createdAt: string; // ISO string
   updatedAt: string; // ISO string
   pins: MemoryPin[];
+  media?: MemoryRouteMedia;
 }
 
 export interface RouteLibrary {
