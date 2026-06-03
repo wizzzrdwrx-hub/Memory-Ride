@@ -24,6 +24,6 @@
   - [x] Update stop metadata display (Calendar year, Stop Title, Description narrative).
   - [x] Add perspective metadata footer detailing Source, Confidence, and Nostalgia Strength.
   - [x] Add Selector and read-only Preview Card inside the Stop Editor in Creator Mode.
-- [/] Verification:
-  - [/] Run `cmd /c npm run lint`
-  - [/] Run `cmd /c npm run build`
+- [x] Verification:
+  - [x] Run `cmd /c npm run lint`
+  - [x] Run `cmd /c npm run build`
