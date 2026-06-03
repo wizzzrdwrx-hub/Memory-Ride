@@ -10,6 +10,10 @@ export const memoryPins: MemoryPin[] = [
     locationName: "East Bay Street, Charleston",
     year: "1994",
     audioDuration: "1:24",
+    media: {
+      imageSourceType: "url",
+      audioSourceType: "none",
+    },
   },
   {
     id: 2,
@@ -20,6 +24,10 @@ export const memoryPins: MemoryPin[] = [
     locationName: "James Island Expressway",
     year: "1994",
     audioDuration: "2:05",
+    media: {
+      imageSourceType: "url",
+      audioSourceType: "none",
+    },
   },
   {
     id: 3,
@@ -30,6 +38,10 @@ export const memoryPins: MemoryPin[] = [
     locationName: "Folly Road, Crosby's Seafood",
     year: "1994",
     audioDuration: "1:58",
+    media: {
+      imageSourceType: "url",
+      audioSourceType: "none",
+    },
   },
   {
     id: 4,
@@ -40,6 +52,10 @@ export const memoryPins: MemoryPin[] = [
     locationName: "1 Center Street, Folly Beach",
     year: "1994",
     audioDuration: "3:12",
+    media: {
+      imageSourceType: "url",
+      audioSourceType: "none",
+    },
   },
 ];
 
@@ -53,4 +69,7 @@ export const defaultMemoryRoute: MemoryRoute = {
   createdAt: "2026-06-02T12:00:00.000Z",
   updatedAt: "2026-06-02T12:00:00.000Z",
   pins: memoryPins,
+  media: {
+    coverImageSourceType: "url",
+  },
 };

@@ -1,38 +1,24 @@
-# Task: Implement Creator Mode v0.1 (Brutally Small)
+# Task: v0.3 Media Prep
 
-- [x] Add `pins` list state in `page.tsx` initialized from `localStorage` or defaults.
-- [x] Compute route GeoJSON dynamically based on pin locations.
-- [x] Add a Mode Selector (`view` vs `edit`) in the application interface.
-- [x] Update `MemoryRideMap.tsx`:
-  - [x] Make active pin `draggable` in edit mode.
-  - [x] Implement click-on-map to reposition the active pin.
-  - [x] Render the dynamic route line connecting the current pins.
-- [x] Update `MemoryDashboard.tsx` to display the Edit Form when in `edit` mode:
-  - [x] Form fields for Title, Year, Location Name, Narrative Text, Image URL.
-  - [x] "Add Stop" button to append a new memory pin.
-  - [x] "Delete Stop" button to remove the current memory pin.
-  - [x] Export Route as JSON file action.
-  - [x] Import Route from JSON file action.
-  - [x] "Reset Demo" button to reload original 1994 road trip.
-- [x] Validate and run build tests.
-
-# Creator Mode v0.1.1 Stability Polish
-
-- [x] Empty state when no pins exist
-- [x] Safe active-pin fallback after delete/import/reset
-- [x] Broken image placeholder fallback
-- [x] Stronger JSON schema validation
-- [x] localStorage version key
-- [x] Sample route JSON in `/public/demo-routes/`
-- [x] README demo script
-- [x] Final GitHub repo verification
-
-# Creator Mode v0.2
-
-- [ ] Multiple saved routes
-- [ ] Route title and description editor
-- [ ] Route cover image
-- [ ] Image upload or local preview
-- [ ] Microphone narration recording
-- [ ] Read-only share mode
-- [ ] Present Mode for investor/family walkthroughs
+- [x] Extend media type definitions in `app/types/index.ts`:
+  - [x] Create `ImageSourceType`, `AudioSourceType` types.
+  - [x] Add `MemoryPinMedia`, `MemoryRouteMedia` structures.
+  - [x] Add optional `media` field to `MemoryPin` and `MemoryRoute`.
+  - [x] Keep legacy attributes: `MemoryPin.image`, `MemoryPin.audioDuration`, `MemoryRoute.coverImage`.
+- [x] Add validation helpers in `app/lib/schemas.ts`:
+  - [x] `validateMemoryPinMedia` schema checker.
+  - [x] `validateMemoryRouteMedia` schema checker.
+  - [x] Update `validateMemoryPin`, `validateMemoryRoute`, and `normalizeImportedRoute` to support and validate the new optional `media` structures strictly.
+- [x] Update Mock data in `app/data/mockData.ts`:
+  - [x] Add `media` block metadata to the Charleston default route and pins with default `"url"` and `"none"` source types.
+- [x] Attach default media structures on creation inside `app/page.tsx`:
+  - [x] Initialize stop media in `handleAddPin`.
+  - [x] Initialize route media in `handleCreateRoute`.
+- [x] Refactor UI elements in `app/components/MemoryDashboard.tsx`:
+  - [x] Cover image sourcing dropdown and explanation microcopy.
+  - [x] Stop image sourcing dropdown, renaming label, and explanation microcopy.
+  - [x] Stop audio settings box with audio source type selector, label string, and helper text.
+  - [x] Retain visual rendering from base fields (no file picker/microphone added).
+- [x] Quality & Compatibility Verification:
+  - [x] Run `cmd /c npm run lint` (passes with 0 errors).
+  - [x] Run `cmd /c npm run build` (passes successfully).

@@ -1,10 +1,43 @@
-import { MemoryPin, MemoryRoute, RouteLibrary } from "../types";
+import { MemoryPin, MemoryRoute, RouteLibrary, MemoryPinMedia, MemoryRouteMedia } from "../types";
 
 /**
  * Safely returns a usable string or a fallback.
  */
 const safeString = (value: unknown, fallback: string): string => {
   return typeof value === "string" && value.trim().length > 0 ? value : fallback;
+};
+
+/**
+ * Validates the media structure of a memory pin.
+ */
+export const validateMemoryPinMedia = (media: unknown): media is MemoryPinMedia => {
+  if (!media || typeof media !== "object") return false;
+
+  const m = media as Partial<MemoryPinMedia>;
+
+  return (
+    (m.imageUrl === undefined || typeof m.imageUrl === "string") &&
+    (m.imageSourceType === undefined || ["url", "local-preview", "future-upload"].includes(m.imageSourceType)) &&
+    (m.imageAlt === undefined || typeof m.imageAlt === "string") &&
+    (m.audioLabel === undefined || typeof m.audioLabel === "string") &&
+    (m.audioDuration === undefined || typeof m.audioDuration === "string") &&
+    (m.audioSourceType === undefined || ["none", "future-recording", "future-upload"].includes(m.audioSourceType))
+  );
+};
+
+/**
+ * Validates the media structure of a memory route.
+ */
+export const validateMemoryRouteMedia = (media: unknown): media is MemoryRouteMedia => {
+  if (!media || typeof media !== "object") return false;
+
+  const m = media as Partial<MemoryRouteMedia>;
+
+  return (
+    (m.coverImageUrl === undefined || typeof m.coverImageUrl === "string") &&
+    (m.coverImageSourceType === undefined || ["url", "local-preview", "future-upload"].includes(m.coverImageSourceType)) &&
+    (m.coverImageAlt === undefined || typeof m.coverImageAlt === "string")
+  );
 };
 
 /**
@@ -33,7 +66,8 @@ export const validateMemoryPin = (pin: unknown): pin is MemoryPin => {
     typeof p.image === "string" &&
     typeof p.locationName === "string" &&
     typeof p.year === "string" &&
-    typeof p.audioDuration === "string"
+    typeof p.audioDuration === "string" &&
+    (p.media === undefined || validateMemoryPinMedia(p.media))
   );
 };
 
@@ -56,7 +90,8 @@ export const validateMemoryRoute = (route: unknown): route is MemoryRoute => {
     typeof r.createdAt === "string" &&
     typeof r.updatedAt === "string" &&
     Array.isArray(r.pins) &&
-    r.pins.every(validateMemoryPin)
+    r.pins.every(validateMemoryPin) &&
+    (r.media === undefined || validateMemoryRouteMedia(r.media))
   );
 };
 
@@ -106,6 +141,7 @@ export const normalizeImportedRoute = (data: unknown): MemoryRoute | null => {
 
       if (validPins.length > 0) {
         const now = new Date().toISOString();
+        const media = obj.media && validateMemoryRouteMedia(obj.media) ? obj.media : undefined;
 
         return {
           id: safeString(obj.id, `route-${Date.now()}`),
@@ -117,6 +153,7 @@ export const normalizeImportedRoute = (data: unknown): MemoryRoute | null => {
           createdAt: safeString(obj.createdAt, now),
           updatedAt: now,
           pins: validPins,
+          media,
         };
       }
     }

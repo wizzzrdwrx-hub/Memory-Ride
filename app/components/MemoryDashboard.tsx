@@ -15,7 +15,7 @@ import {
   Upload,
   RotateCcw,
 } from "lucide-react";
-import { MemoryPin, MemoryRoute } from "../types";
+import { MemoryPin, MemoryRoute, ImageSourceType, AudioSourceType } from "../types";
 import ImageWithFallback from "./ImageWithFallback";
 
 interface MemoryDashboardProps {
@@ -366,8 +366,8 @@ export default function MemoryDashboard({
                       placeholder="e.g., Henry Family"
                     />
                   </div>
-                  <div className="flex flex-col space-y-1 md:col-span-3">
-                    <label className="font-semibold text-[11px] text-stone-600">Cover Image URL</label>
+                  <div className="flex flex-col space-y-1 md:col-span-2">
+                    <label className="font-semibold text-[11px] text-stone-600">Cover Image URL or Path</label>
                     <input
                       type="text"
                       value={activeRoute?.coverImage || ""}
@@ -376,6 +376,30 @@ export default function MemoryDashboard({
                       className="p-2 border border-stone-300 bg-white text-stone-900 rounded focus:outline-none focus:ring-1 focus:ring-amber-700 text-xs"
                       placeholder="e.g., /images/battery.png or web URL"
                     />
+                    <p className="text-[9px] text-stone-500 font-sans mt-0.5 leading-tight">
+                      Current MVP supports image URLs and local public paths (e.g., <code>/images/battery.png</code>). Do not paste base64 image strings.
+                    </p>
+                  </div>
+                  <div className="flex flex-col space-y-1">
+                    <label className="font-semibold text-[11px] text-stone-600">Cover Image Sourcing</label>
+                    <select
+                      value={activeRoute?.media?.coverImageSourceType || "url"}
+                      onChange={(e) => {
+                        const val = e.target.value as ImageSourceType;
+                        onUpdateRouteMetadata({
+                          media: {
+                            ...activeRoute?.media,
+                            coverImageSourceType: val,
+                          },
+                        });
+                      }}
+                      onFocus={() => setPreviewSource("route")}
+                      className="p-2 border border-stone-300 bg-white text-stone-900 rounded focus:outline-none focus:ring-1 focus:ring-amber-700 text-xs font-sans"
+                    >
+                      <option value="url">🔗 External URL / Path</option>
+                      <option value="local-preview" disabled>🖥️ Local Preview (Deferred)</option>
+                      <option value="future-upload" disabled>☁️ Cloud Vault (Deferred)</option>
+                    </select>
                   </div>
                   <div className="flex flex-col space-y-1 md:col-span-3">
                     <label className="font-semibold text-[11px] text-stone-600">Description</label>
@@ -432,7 +456,28 @@ export default function MemoryDashboard({
                       />
                     </div>
                     <div className="flex flex-col space-y-1">
-                      <label className="font-semibold text-[11px] text-stone-600">Image URL</label>
+                      <label className="font-semibold text-[11px] text-stone-600">Image Sourcing</label>
+                      <select
+                        value={activePin.media?.imageSourceType || "url"}
+                        onChange={(e) => {
+                          const val = e.target.value as ImageSourceType;
+                          onUpdatePinFields(activePin.id, {
+                            media: {
+                              ...activePin.media,
+                              imageSourceType: val,
+                            },
+                          });
+                        }}
+                        onFocus={() => setPreviewSource("stop")}
+                        className="p-2 border border-stone-300 bg-white text-stone-900 rounded focus:outline-none focus:ring-1 focus:ring-amber-700 text-xs font-sans"
+                      >
+                        <option value="url">🔗 External URL / Path</option>
+                        <option value="local-preview" disabled>🖥️ Local Preview (Deferred)</option>
+                        <option value="future-upload" disabled>☁️ Cloud Vault (Deferred)</option>
+                      </select>
+                    </div>
+                    <div className="flex flex-col space-y-1 md:col-span-2">
+                      <label className="font-semibold text-[11px] text-stone-600">Image URL or Path</label>
                       <input
                         type="text"
                         value={activePin.image}
@@ -441,6 +486,9 @@ export default function MemoryDashboard({
                         className="p-2 border border-stone-300 bg-white text-stone-900 rounded focus:outline-none focus:ring-1 focus:ring-amber-700 text-xs"
                         placeholder="e.g., /images/crosbys.png or web URL"
                       />
+                      <p className="text-[9px] text-stone-500 font-sans mt-0.5 leading-tight">
+                        Current MVP supports image URLs and local /public image paths (e.g., <code>/images/crosbys.png</code>). Do not paste base64 images. Local file preview, cloud upload, and audio recording are planned future features.
+                      </p>
                     </div>
                     <div className="flex flex-col space-y-1 md:col-span-2">
                       <label className="font-semibold text-[11px] text-stone-600">Memory Narrative</label>
@@ -453,22 +501,70 @@ export default function MemoryDashboard({
                         placeholder="Write the narrative memory..."
                       />
                     </div>
-                    <div className="flex items-center justify-between md:col-span-2 text-[9px] text-stone-500 bg-stone-100 p-2 rounded border border-stone-200">
-                      <div>
-                        <span className="font-semibold">Coordinates:</span> [
-                        {activePin.coordinates[0].toFixed(5)}, {activePin.coordinates[1].toFixed(5)}]
+                    <div className="md:col-span-2 border border-stone-200 rounded p-2.5 bg-stone-100/50 space-y-2">
+                      <div className="flex items-center justify-between text-[10px] text-stone-500 font-sans">
+                        <div>
+                          <span className="font-semibold">Coordinates:</span> [
+                          {activePin.coordinates[0].toFixed(5)}, {activePin.coordinates[1].toFixed(5)}]
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <label className="font-semibold text-stone-600">Tape Length:</label>
+                          <input
+                            type="text"
+                            value={activePin.audioDuration}
+                            onChange={(e) => onUpdatePinFields(activePin.id, { audioDuration: e.target.value })}
+                            onFocus={() => setPreviewSource("stop")}
+                            className="w-12 p-0.5 border border-stone-300 bg-white text-stone-900 rounded text-center text-xs"
+                            placeholder="1:30"
+                          />
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <label className="font-semibold text-stone-600">Tape Length:</label>
-                        <input
-                          type="text"
-                          value={activePin.audioDuration}
-                          onChange={(e) => onUpdatePinFields(activePin.id, { audioDuration: e.target.value })}
-                          onFocus={() => setPreviewSource("stop")}
-                          className="w-12 p-0.5 border border-stone-300 bg-white text-stone-900 rounded text-center text-xs"
-                          placeholder="1:30"
-                        />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-stone-200/60 text-[10px]">
+                        <div className="flex flex-col space-y-1">
+                          <label className="font-semibold text-stone-600">Audio Source Type</label>
+                          <select
+                            value={activePin.media?.audioSourceType || "none"}
+                            onChange={(e) => {
+                              const val = e.target.value as AudioSourceType;
+                              onUpdatePinFields(activePin.id, {
+                                media: {
+                                  ...activePin.media,
+                                  audioSourceType: val,
+                                },
+                              });
+                            }}
+                            onFocus={() => setPreviewSource("stop")}
+                            className="p-1 border border-stone-300 bg-white text-stone-900 rounded focus:outline-none focus:ring-1 focus:ring-amber-700 text-xs font-sans"
+                          >
+                            <option value="none">🔇 None / Silent</option>
+                            <option value="future-recording" disabled>🎙️ Voice Recorder (Deferred)</option>
+                            <option value="future-upload" disabled>📤 Audio Upload (Deferred)</option>
+                          </select>
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                          <label className="font-semibold text-stone-600">Audio Label / Title</label>
+                          <input
+                            type="text"
+                            value={activePin.media?.audioLabel || ""}
+                            onChange={(e) => {
+                              onUpdatePinFields(activePin.id, {
+                                media: {
+                                  ...activePin.media,
+                                  audioLabel: e.target.value,
+                                },
+                              });
+                            }}
+                            onFocus={() => setPreviewSource("stop")}
+                            className="p-1 border border-stone-300 bg-white text-stone-900 rounded focus:outline-none focus:ring-1 focus:ring-amber-700 text-xs"
+                            placeholder="e.g., Shoreline Waves (Planning)"
+                          />
+                        </div>
                       </div>
+
+                      <p className="text-[9px] text-stone-500 font-sans leading-tight mt-1">
+                        Microphone voice recording and audio uploads are deferred future features. Do not paste base64 audio strings into this field.
+                      </p>
                     </div>
                   </div>
                 ) : (
