@@ -42,6 +42,41 @@ export const memoryPins: MemoryPin[] = [
       imageSourceType: "url",
       audioSourceType: "none",
     },
+    temporalPerspectives: [
+      {
+        id: "crosbys-1994",
+        year: "1994",
+        label: "Family road-trip memory",
+        title: "Crosby’s Seafood, 1994",
+        text: "Dad stopped to get shrimp for the boil. It smelled like salt, ice, diesel, and pluff mud. This was one of those road-trip stops that became part of the beach ritual.",
+        image: "/images/crosbys_1994.jpg",
+        sourceNote: "Family memory layer with uploaded era image.",
+        confidence: "personal",
+        hxStrength: 0.72
+      },
+      {
+        id: "crosbys-2016",
+        year: "2016",
+        label: "Recent memory layer",
+        title: "Crosby’s Seafood, 2016",
+        text: "The place still anchors the route, but the light, signs, cars, and road rhythm have shifted. The memory is still there, just wearing a newer coat of paint.",
+        image: "/images/crosbys_2016.jpg",
+        sourceNote: "Uploaded 2016 reference image.",
+        confidence: "reference",
+        hxStrength: 0.84
+      },
+      {
+        id: "crosbys-2024",
+        year: "2024",
+        label: "Current-day reference",
+        title: "Crosby’s Seafood, 2024",
+        text: "The modern view becomes the strongest reference layer: the same stop, same route, same coastal pull toward Folly, but sharpened by current visual evidence.",
+        image: "/images/crosbys_2024.jpg",
+        sourceNote: "Uploaded 2024 reference image.",
+        confidence: "current-reference",
+        hxStrength: 0.92
+      }
+    ]
   },
   {
     id: 4,
