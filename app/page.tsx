@@ -19,7 +19,7 @@ export default function Home() {
   const [activePin, setActivePin] = useState<MemoryPin | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [ambientStatic, setAmbientStatic] = useState<boolean>(true);
-  const [mode, setMode] = useState<"view" | "edit">("view");
+  const [mode, setMode] = useState<"view" | "edit" | "present">("view");
 
   const activeRoute = library.routes.find((r) => r.id === library.activeRouteId) || library.routes[0];
   const pins = activeRoute ? activeRoute.pins : [];
@@ -366,8 +366,8 @@ export default function Home() {
             {[activeRoute?.era, activeRoute?.author].filter(Boolean).join(" • ")}
           </p>
 
-          {/* Minimal Route Selector UI */}
-          {library.routes.length > 1 && (
+          {/* Minimal Route Selector UI (Hidden in Present Mode) */}
+          {mode !== "present" && library.routes.length > 1 && (
             <div className="mt-3 pt-2 border-t border-stone-200/50">
               <label className="block text-[9px] uppercase font-sans text-stone-400 font-bold tracking-widest mb-1">
                 Select Memory Ride
@@ -397,29 +397,48 @@ export default function Home() {
             </div>
           )}
 
-          {/* Mode Toggles */}
-          <div className="flex items-center space-x-2 mt-3 pt-3 border-t border-stone-200/50">
-            <button
-              onClick={() => setMode("view")}
-              className={`flex-1 text-center py-1.5 px-3 rounded text-[10px] uppercase tracking-wider font-sans font-bold transition-all shadow-sm ${
-                mode === "view"
-                  ? "bg-amber-700 text-stone-50"
-                  : "bg-stone-200/60 text-stone-600 hover:text-stone-800 hover:bg-stone-200"
-              }`}
-            >
-              View Story
-            </button>
-            <button
-              onClick={() => setMode("edit")}
-              className={`flex-1 text-center py-1.5 px-3 rounded text-[10px] uppercase tracking-wider font-sans font-bold transition-all shadow-sm ${
-                mode === "edit"
-                  ? "bg-amber-700 text-stone-50"
-                  : "bg-stone-200/60 text-stone-600 hover:text-stone-800 hover:bg-stone-200"
-              }`}
-            >
-              Creator Mode
-            </button>
-          </div>
+          {/* Mode Toggles (Hidden in Present Mode) */}
+          {mode !== "present" ? (
+            <div className="flex items-center space-x-2 mt-3 pt-3 border-t border-stone-200/50">
+              <button
+                onClick={() => setMode("view")}
+                className={`flex-1 text-center py-1.5 px-3 rounded text-[10px] uppercase tracking-wider font-sans font-bold transition-all shadow-sm ${
+                  mode === "view"
+                    ? "bg-amber-700 text-stone-50"
+                    : "bg-stone-200/60 text-stone-600 hover:text-stone-800 hover:bg-stone-200"
+                }`}
+              >
+                View Story
+              </button>
+              <button
+                onClick={() => setMode("edit")}
+                className={`flex-1 text-center py-1.5 px-3 rounded text-[10px] uppercase tracking-wider font-sans font-bold transition-all shadow-sm ${
+                  mode === "edit"
+                    ? "bg-amber-700 text-stone-50"
+                    : "bg-stone-200/60 text-stone-600 hover:text-stone-800 hover:bg-stone-200"
+                }`}
+              >
+                Creator Mode
+              </button>
+              <button
+                onClick={() => setMode("present")}
+                className="flex-1 text-center py-1.5 px-3 rounded text-[10px] uppercase tracking-wider font-sans font-bold transition-all shadow-sm bg-stone-200/60 text-stone-600 hover:text-stone-800 hover:bg-stone-200"
+                title="Enter Present Mode"
+              >
+                Present
+              </button>
+            </div>
+          ) : (
+            /* Present Mode Exit Controls */
+            <div className="mt-3 pt-2.5 border-t border-stone-200/50 flex justify-end">
+              <button
+                onClick={() => setMode("view")}
+                className="px-3 py-1.5 bg-stone-800 hover:bg-stone-900 text-stone-50 text-[10px] font-sans font-bold uppercase tracking-wider rounded transition-colors shadow-sm"
+              >
+                Exit Present Mode
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Floating Ambient Console Button (Top-Right) */}

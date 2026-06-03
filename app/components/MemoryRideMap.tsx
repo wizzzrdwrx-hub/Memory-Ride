@@ -10,7 +10,7 @@ const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 interface MemoryRideMapProps {
   pins: MemoryPin[];
   activePin: MemoryPin | null;
-  mode: "view" | "edit";
+  mode: "view" | "edit" | "present";
   onPinSelect: (pin: MemoryPin) => void;
   onUpdatePinCoordinates: (id: number, coordinates: [number, number]) => void;
 }
@@ -90,7 +90,7 @@ export default function MemoryRideMap({
         mapboxAccessToken={mapboxToken}
         style={{ width: "100%", height: "100%" }}
         onClick={handleMapClick}
-        doubleClickZoom={mode === "view"} // Disable zoom-on-double-click during editing for easier clicking
+        doubleClickZoom={mode === "view" || mode === "present"} // Disable zoom-on-double-click during editing for easier clicking
       >
         {/* Draw Dynamic Route LineString */}
         {dynamicRouteGeoJson && (

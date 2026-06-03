@@ -33,6 +33,7 @@ The project is structured inside the `memory-ride-mvp/` folder as follows:
 * **Real-time Polaroid Preview**: Polaroid card displays image URL previews instantly as they are typed. Automatically alternates the preview source (between route cover image and active stop photo) based on input focus.
 * **Route Portability**: Isolated buttons (`Export Current Route`, `Import Route`) to download only the active route (naming files based on the route title) or upload a route JSON (replacing/matching by route ID without wiping unrelated routes).
 * **Library Portability**: Dedicated backup controls (`Export Full Library`, `Import Full Library`) to export the entire `RouteLibrary` object (`memory_ride_library.json`) and import it with schema validation and warning/confirmation dialogs.
+* **Present Mode**: A clean distraction-free playback presentation view that hides route settings forms, stop editor text inputs, CRUD buttons, and portability file inputs, displaying only the dynamic Map, Polaroid photo, active stop narration, and cassette deck audio console.
 * **Caching & Caching Recovery**: Auto-syncs all edits to `localStorage` under `memory_ride_library` with a fallback "Reset Demo" button to reload the 1994 demo.
 * **Cassette Deck & Visual Aesthetics**: Interactive audio controller with dual rotating cassette reels.
 
@@ -93,7 +94,6 @@ Use this checklist after pulling the branch or reviewing the PR.
 
 The following features are intentionally not implemented yet:
 
-- Read-only Present Mode
 - Microphone recording
 - Audio file storage
 - Backend database
@@ -106,8 +106,8 @@ This release keeps the app local-first and frontend-only. The goal is to stabili
 
 ---
 
-## 🧭 Next Recommended Slice: Present Mode / Presenter Overlay
-The next development branch can target Present Mode for previewing stories in full screen without the dashboard editor controls.
+## 🧭 Next Recommended Slice: Local Image Attachments / Assets Management
+The next development branch can target local asset management (like local image uploads via base64 encoding or file selector integrations) to replace hardcoded image URL strings.
 
 ---
 
