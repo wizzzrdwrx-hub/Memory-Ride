@@ -21,8 +21,9 @@ export const loadLibrary = (fallback: RouteLibrary): RouteLibrary => {
         return parsed;
       }
     } catch {
-      // Degrade to migration filters
+      // Fall through to removal
     }
+    localStorage.removeItem(STORAGE_KEY);
   }
 
   // 2. Try migrating v0.1.1 route file structure
@@ -69,6 +70,7 @@ export const loadLibrary = (fallback: RouteLibrary): RouteLibrary => {
   }
 
   // 4. Return default fallback library
+  saveLibrary(fallback);
   return fallback;
 };
 
