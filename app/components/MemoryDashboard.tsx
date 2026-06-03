@@ -36,6 +36,8 @@ interface MemoryDashboardProps {
   onCreateRoute: () => void;
   onDuplicateRoute: () => void;
   onDeleteRoute: () => void;
+  onExportLibrary: () => void;
+  onImportLibrary: (jsonData: string) => void;
 }
 
 export default function MemoryDashboard({
@@ -56,11 +58,14 @@ export default function MemoryDashboard({
   onCreateRoute,
   onDuplicateRoute,
   onDeleteRoute,
+  onExportLibrary,
+  onImportLibrary,
 }: MemoryDashboardProps) {
   // Simulated playback time tracking
   const [playProgress, setPlayProgress] = useState(0); // 0 to 100
   const [currentTimeSec, setCurrentTimeSec] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const libraryInputRef = useRef<HTMLInputElement>(null);
   const [previewSource, setPreviewSource] = useState<"route" | "stop">("stop");
 
   // Reset progress and set preview source when the pin changes
@@ -113,7 +118,7 @@ export default function MemoryDashboard({
     setCurrentTimeSec(Math.floor((value / 100) * totalDurationSec));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRouteFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const reader = new FileReader();
@@ -123,11 +128,30 @@ export default function MemoryDashboard({
         }
       };
       reader.readAsText(files[0]);
+      e.target.value = "";
     }
   };
 
-  const triggerFileInput = () => {
+  const triggerRouteFileInput = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleLibraryFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          onImportLibrary(event.target.result as string);
+        }
+      };
+      reader.readAsText(files[0]);
+      e.target.value = "";
+    }
+  };
+
+  const triggerLibraryFileInput = () => {
+    libraryInputRef.current?.click();
   };
 
   return (
@@ -517,23 +541,32 @@ export default function MemoryDashboard({
                 </button>
               </div>
 
-              {/* Portability / Reset */}
+              {/* Hidden File Inputs */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleRouteFileChange}
+                accept=".json"
+                className="hidden"
+              />
+              <input
+                type="file"
+                ref={libraryInputRef}
+                onChange={handleLibraryFileChange}
+                accept=".json"
+                className="hidden"
+              />
+
+              {/* Route Portability */}
               <div className="flex items-center space-x-2">
-                <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400 mr-1">Files:</span>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  accept=".json"
-                  className="hidden"
-                />
+                <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400 mr-1">Route Portability:</span>
                 <button
-                  onClick={triggerFileInput}
+                  onClick={triggerRouteFileInput}
                   className="flex items-center px-2 py-1.2 border border-stone-300 text-stone-600 rounded hover:bg-stone-100 hover:text-stone-850 transition-colors text-[10px]"
-                  title="Import JSON Route"
+                  title="Import Route JSON"
                 >
                   <Upload className="w-3 h-3 mr-1" />
-                  Import JSON
+                  Import Route
                 </button>
                 <button
                   onClick={onExportRoute}
@@ -541,7 +574,28 @@ export default function MemoryDashboard({
                   title="Export Current Route as JSON"
                 >
                   <Download className="w-3 h-3 mr-1" />
-                  Export JSON
+                  Export Current Route
+                </button>
+              </div>
+
+              {/* Library Portability */}
+              <div className="flex items-center space-x-2">
+                <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400 mr-1">Library Portability:</span>
+                <button
+                  onClick={triggerLibraryFileInput}
+                  className="flex items-center px-2 py-1.2 border border-stone-300 text-stone-600 rounded hover:bg-stone-100 hover:text-stone-850 transition-colors text-[10px]"
+                  title="Import Full Library JSON"
+                >
+                  <Upload className="w-3 h-3 mr-1" />
+                  Import Full Library
+                </button>
+                <button
+                  onClick={onExportLibrary}
+                  className="flex items-center px-2 py-1.2 border border-stone-300 text-stone-600 rounded hover:bg-stone-100 hover:text-stone-850 transition-colors text-[10px]"
+                  title="Export Full Library as JSON"
+                >
+                  <Download className="w-3 h-3 mr-1" />
+                  Export Full Library
                 </button>
                 <button
                   onClick={onResetDemo}
@@ -549,7 +603,7 @@ export default function MemoryDashboard({
                   title="Reset Route to Default Demo"
                 >
                   <RotateCcw className="w-3 h-3 mr-1" />
-                  Reset
+                  Reset Demo
                 </button>
               </div>
 
