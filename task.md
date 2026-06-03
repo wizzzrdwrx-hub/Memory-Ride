@@ -25,7 +25,7 @@
 - [x] localStorage version key
 - [x] Sample route JSON in `/public/demo-routes/`
 - [x] README demo script
-- [ ] Final GitHub repo verification
+- [x] Final GitHub repo verification
 
 # Creator Mode v0.2
 
