@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import MemoryRideMap from "./components/MemoryRideMap";
 import MemoryDashboard from "./components/MemoryDashboard";
 import { defaultMemoryRoute } from "./data/mockData";
-import { MemoryPin, RouteLibrary } from "./types";
+import { MemoryPin, MemoryRoute, RouteLibrary } from "./types";
 import { normalizeImportedRoute } from "./lib/schemas";
 import { loadLibrary, saveLibrary } from "./lib/storage";
 import { Compass, Disc } from "lucide-react";
@@ -193,6 +193,104 @@ export default function Home() {
     }
   };
 
+  const handleUpdateRouteMetadata = (fields: Partial<MemoryRoute>) => {
+    if (!activeRoute) return;
+    const updatedRoutes = library.routes.map((r) =>
+      r.id === activeRoute.id
+        ? { ...r, ...fields, updatedAt: new Date().toISOString() }
+        : r
+    );
+    const updatedLibrary = {
+      ...library,
+      routes: updatedRoutes,
+    };
+    setLibrary(updatedLibrary);
+    saveLibrary(updatedLibrary);
+  };
+
+  const handleCreateRoute = () => {
+    const newId = `route-${Date.now()}`;
+    const newRoute: MemoryRoute = {
+      id: newId,
+      title: "New Memory Ride",
+      description: "A brand new nostalgic memory ride storyboard.",
+      era: "2026",
+      author: "Family Archivist",
+      coverImage: "",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      pins: [],
+    };
+    const updatedLibrary = {
+      version: 2,
+      activeRouteId: newId,
+      routes: [...library.routes, newRoute],
+    };
+    setLibrary(updatedLibrary);
+    saveLibrary(updatedLibrary);
+    setActivePin(null);
+  };
+
+  const handleDuplicateRoute = () => {
+    if (!activeRoute) return;
+    const newId = `route-${Date.now()}`;
+    const duplicatedRoute: MemoryRoute = {
+      ...activeRoute,
+      id: newId,
+      title: `${activeRoute.title} (Copy)`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      pins: activeRoute.pins.map((p) => ({ ...p })),
+    };
+    const updatedLibrary = {
+      version: 2,
+      activeRouteId: newId,
+      routes: [...library.routes, duplicatedRoute],
+    };
+    setLibrary(updatedLibrary);
+    saveLibrary(updatedLibrary);
+    if (duplicatedRoute.pins.length > 0) {
+      setActivePin(duplicatedRoute.pins[0]);
+    } else {
+      setActivePin(null);
+    }
+  };
+
+  const handleDeleteRoute = () => {
+    if (!activeRoute) return;
+
+    if (library.routes.length <= 1) {
+      if (confirm("This is the last route in your library. Deleting it will reset the library to the default Charleston Battery to Folly Beach route. Proceed?")) {
+        loadDefaults();
+      }
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to delete the route "${activeRoute.title}"?`)) {
+      return;
+    }
+
+    const remainingRoutes = library.routes.filter((r) => r.id !== activeRoute.id);
+    const deletedIndex = library.routes.findIndex((r) => r.id === activeRoute.id);
+    const nextActiveIndex = Math.min(deletedIndex, remainingRoutes.length - 1);
+    const nextActiveRoute = remainingRoutes[nextActiveIndex];
+
+    const updatedLibrary = {
+      version: 2,
+      activeRouteId: nextActiveRoute.id,
+      routes: remainingRoutes,
+    };
+
+    setLibrary(updatedLibrary);
+    saveLibrary(updatedLibrary);
+
+    if (nextActiveRoute.pins.length > 0) {
+      setActivePin(nextActiveRoute.pins[0]);
+    } else {
+      setActivePin(null);
+    }
+  };
+
   const handleResetDemo = () => {
     if (confirm("Reset to default 1994 demo route? Any custom edits will be lost.")) {
       loadDefaults();
@@ -306,6 +404,7 @@ export default function Home() {
       <div className="h-[40vh] w-full">
         <MemoryDashboard
           activePin={safeActivePin}
+          activeRoute={activeRoute}
           isPlaying={isPlaying}
           mode={mode}
           onPlayPauseToggle={handlePlayPauseToggle}
@@ -317,6 +416,10 @@ export default function Home() {
           onExportRoute={handleExportRoute}
           onImportRoute={handleImportRoute}
           onResetDemo={handleResetDemo}
+          onUpdateRouteMetadata={handleUpdateRouteMetadata}
+          onCreateRoute={handleCreateRoute}
+          onDuplicateRoute={handleDuplicateRoute}
+          onDeleteRoute={handleDeleteRoute}
         />
       </div>
 
