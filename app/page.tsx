@@ -6,7 +6,7 @@ import MemoryRideMap from "./components/MemoryRideMap";
 import MemoryDashboard from "./components/MemoryDashboard";
 import { defaultMemoryRoute } from "./data/mockData";
 import { MemoryPin, MemoryRoute, RouteLibrary } from "./types";
-import { normalizeImportedRoute } from "./lib/schemas";
+import { normalizeImportedRoute, validateRouteLibrary } from "./lib/schemas";
 import { loadLibrary, saveLibrary } from "./lib/storage";
 import { Compass, Disc } from "lucide-react";
 
@@ -171,7 +171,7 @@ export default function Home() {
       const parsed = JSON.parse(jsonData);
       const normalizedRoute = normalizeImportedRoute(parsed);
 
-      if (normalizedRoute && normalizedRoute.pins.length > 0) {
+      if (normalizedRoute) {
         const updatedRoutes = [
           ...library.routes.filter((r) => r.id !== normalizedRoute.id),
           normalizedRoute,
@@ -183,10 +183,52 @@ export default function Home() {
         };
         setLibrary(updatedLibrary);
         saveLibrary(updatedLibrary);
-        setActivePin(normalizedRoute.pins[0]);
+        if (normalizedRoute.pins.length > 0) {
+          setActivePin(normalizedRoute.pins[0]);
+        } else {
+          setActivePin(null);
+        }
         alert("Route imported successfully!");
       } else {
         alert("Invalid route JSON schema structure. Import aborted.");
+      }
+    } catch {
+      alert("Error parsing JSON file. Make sure it is valid JSON.");
+    }
+  };
+
+  const handleExportLibrary = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(library, null, 2));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "memory_ride_library.json");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  const handleImportLibrary = (jsonData: string) => {
+    try {
+      const parsed = JSON.parse(jsonData);
+      if (!validateRouteLibrary(parsed)) {
+        alert("Invalid library JSON schema structure. Import aborted.");
+        return;
+      }
+
+      if (
+        confirm(
+          "This will replace your entire local route library, including all custom saved routes. This action cannot be undone. Are you sure you want to proceed?"
+        )
+      ) {
+        setLibrary(parsed);
+        saveLibrary(parsed);
+        const importedActiveRoute = parsed.routes.find((r) => r.id === parsed.activeRouteId) || parsed.routes[0];
+        if (importedActiveRoute && importedActiveRoute.pins.length > 0) {
+          setActivePin(importedActiveRoute.pins[0]);
+        } else {
+          setActivePin(null);
+        }
+        alert("Route library imported successfully!");
       }
     } catch {
       alert("Error parsing JSON file. Make sure it is valid JSON.");
@@ -420,6 +462,8 @@ export default function Home() {
           onCreateRoute={handleCreateRoute}
           onDuplicateRoute={handleDuplicateRoute}
           onDeleteRoute={handleDeleteRoute}
+          onExportLibrary={handleExportLibrary}
+          onImportLibrary={handleImportLibrary}
         />
       </div>
 

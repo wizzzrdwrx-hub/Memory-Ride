@@ -31,8 +31,9 @@ The project is structured inside the `memory-ride-mvp/` folder as follows:
 * **Route Metadata Editing**: Dedicated form fields for Route Title, Era / Year, Author, Cover Image URL, and Description positioned above the Stop Editor.
 * **Route CRUD Controls**: Full local capabilities to **Create New Route**, **Duplicate Current Route** (which deep-copies coordinates and stop properties to prevent mutation), and **Delete Current Route** with safe native confirmation checks.
 * **Real-time Polaroid Preview**: Polaroid card displays image URL previews instantly as they are typed. Automatically alternates the preview source (between route cover image and active stop photo) based on input focus.
-* **JSON Portability**: Action buttons to download the current route as `memory_ride_route.json` or upload custom route configurations (accepts both v0.2 MemoryRoute JSON and legacy flat pin arrays).
-* **Caching & Caching Recovery**: Auto-syncs all edits to `localStorage` under `memory_ride_library` with a fallback "Reset" button to reload the 1994 demo.
+* **Route Portability**: Isolated buttons (`Export Current Route`, `Import Route`) to download only the active route (naming files based on the route title) or upload a route JSON (replacing/matching by route ID without wiping unrelated routes).
+* **Library Portability**: Dedicated backup controls (`Export Full Library`, `Import Full Library`) to export the entire `RouteLibrary` object (`memory_ride_library.json`) and import it with schema validation and warning/confirmation dialogs.
+* **Caching & Caching Recovery**: Auto-syncs all edits to `localStorage` under `memory_ride_library` with a fallback "Reset Demo" button to reload the 1994 demo.
 * **Cassette Deck & Visual Aesthetics**: Interactive audio controller with dual rotating cassette reels.
 
 ## 🚀 Build & Lint Status
