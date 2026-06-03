@@ -38,9 +38,10 @@ export const loadLibrary = (fallback: RouteLibrary): RouteLibrary => {
           activeRouteId: normalizedRoute.id,
           routes: [normalizedRoute],
         };
-        // Save new library and clean up old key
+        // Save new library and clean up old keys
         saveLibrary(migratedLibrary);
         localStorage.removeItem(LEGACY_ROUTE_KEY);
+        localStorage.removeItem(LEGACY_PINS_KEY);
         return migratedLibrary;
       }
     } catch {
@@ -61,6 +62,7 @@ export const loadLibrary = (fallback: RouteLibrary): RouteLibrary => {
           routes: [normalizedRoute],
         };
         saveLibrary(migratedLibrary);
+        localStorage.removeItem(LEGACY_ROUTE_KEY);
         localStorage.removeItem(LEGACY_PINS_KEY);
         return migratedLibrary;
       }
