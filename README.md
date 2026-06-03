@@ -26,6 +26,14 @@ This demo uses a Charleston-to-Folly route to show how old memories can be organ
 
 ---
 
+## 🛡️ Stability Features Added (v0.1.1)
+* **Safe activePin Null Guard**: Intercepts map rendering and panel states to prevent page crashes if all pins are deleted, or when files are imported/reset.
+* **JSON Schema Verification**: Parses uploaded JSON objects and checks data structure and type mappings for all keys before committing to state.
+* **Polaroid Image Fallbacks**: Gracefully degrades broken, empty, or unresolvable URLs to a styled preview card with an `ImageOff` icon.
+* **localStorage Migrations**: Migrates legacy v0.1 flat array formats to standard versioned route structures automatically on boot.
+
+---
+
 ## 🛑 Not Yet Included (Future Targets)
 * Cloud accounts / centralized hosting
 * Hosted image upload integration

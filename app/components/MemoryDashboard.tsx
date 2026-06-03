@@ -15,7 +15,8 @@ import {
   Upload,
   RotateCcw,
 } from "lucide-react";
-import { MemoryPin } from "../data/mockData";
+import { MemoryPin } from "../types";
+import ImageWithFallback from "./ImageWithFallback";
 
 interface MemoryDashboardProps {
   activePin: MemoryPin | null;
@@ -151,20 +152,12 @@ export default function MemoryDashboard({
         <div className="relative bg-white p-3 pb-8 rounded shadow-xl border border-stone-200/60 max-w-[220px] transform -rotate-1 hover:rotate-0 transition-transform duration-300">
           {/* Faded Photo Container */}
           <div className="relative aspect-square w-48 bg-stone-200 overflow-hidden shadow-inner border border-stone-100 flex items-center justify-center">
-            {activePin.image ? (
-              <img
-                src={activePin.image}
-                alt={activePin.title}
-                className="w-full h-full object-cover transition-opacity duration-500 grayscale-[15%] contrast-[105%]"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = "none";
-                }}
-              />
-            ) : (
-              <div className="text-center font-sans text-xs text-stone-400 p-2 leading-tight">
-                No photo. Add URL to preview.
-              </div>
-            )}
+            <ImageWithFallback
+              src={activePin.image}
+              alt={activePin.title || "Stop Image"}
+              className="w-full h-full object-cover transition-opacity duration-500 grayscale-[15%] contrast-[105%]"
+              fallbackClassName="aspect-square"
+            />
             {/* Retro Film Light Leak & Tint */}
             <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/10 via-transparent to-red-400/5 mix-blend-overlay"></div>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,237,213,0.15),transparent)]"></div>

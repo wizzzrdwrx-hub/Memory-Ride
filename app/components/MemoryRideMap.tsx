@@ -2,14 +2,14 @@
 
 import React, { useEffect, useRef } from "react";
 import Map, { Source, Layer, Marker, MapRef } from "react-map-gl/mapbox";
-import { MemoryPin } from "../data/mockData";
+import { MemoryPin } from "../types";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 interface MemoryRideMapProps {
   pins: MemoryPin[];
-  activePin: MemoryPin;
+  activePin: MemoryPin | null;
   mode: "view" | "edit";
   onPinSelect: (pin: MemoryPin) => void;
   onUpdatePinCoordinates: (id: number, coordinates: [number, number]) => void;

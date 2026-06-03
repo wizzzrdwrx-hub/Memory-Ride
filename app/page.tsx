@@ -3,8 +3,11 @@
 import React, { useState, useEffect } from "react";
 import MemoryRideMap from "./components/MemoryRideMap";
 import MemoryDashboard from "./components/MemoryDashboard";
-import { memoryPins, MemoryPin } from "./data/mockData";
-import { Compass, Disc, RefreshCw } from "lucide-react";
+import { memoryPins } from "./data/mockData";
+import { MemoryPin, MemoryRoute } from "./types";
+import { validateMemoryRoute } from "./lib/schemas";
+import { loadRoute, saveRoute } from "./lib/storage";
+import { Compass, Disc } from "lucide-react";
 
 export default function Home() {
   const [pins, setPins] = useState<MemoryPin[]>([]);
@@ -13,37 +16,29 @@ export default function Home() {
   const [ambientStatic, setAmbientStatic] = useState<boolean>(true);
   const [mode, setMode] = useState<"view" | "edit">("view");
 
-  // Load pins on mount from localStorage or fallback to mock defaults
+  // Load route state on mount using schema validator and migration helpers
   useEffect(() => {
-    const saved = localStorage.getItem("memory_ride_pins");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setPins(parsed);
-          setActivePin(parsed[0]);
-        } else {
-          loadDefaults();
-        }
-      } catch (e) {
-        loadDefaults();
-      }
-    } else {
-      loadDefaults();
+    const route = loadRoute({ version: 1, pins: memoryPins });
+    setPins(route.pins);
+    if (route.pins.length > 0) {
+      setActivePin(route.pins[0]);
     }
   }, []);
 
   const loadDefaults = () => {
     setPins(memoryPins);
-    setActivePin(memoryPins[0]);
-    localStorage.setItem("memory_ride_pins", JSON.stringify(memoryPins));
+    setActivePin(memoryPins[0] || null);
+    saveRoute({ version: 1, pins: memoryPins });
   };
 
-  // State update wrapper to sync with localStorage
+  // State update wrapper to sync with localStorage via versioned schemas
   const savePins = (newPins: MemoryPin[]) => {
     setPins(newPins);
-    localStorage.setItem("memory_ride_pins", JSON.stringify(newPins));
+    saveRoute({ version: 1, pins: newPins });
   };
+
+  // Safe active pin selection fallback helper
+  const safeActivePin = pins.find((p) => p.id === activePin?.id) || pins[0] || null;
 
   // Playback control handlers
   const handlePlayPauseToggle = () => {
@@ -51,15 +46,15 @@ export default function Home() {
   };
 
   const handleNextPin = () => {
-    if (pins.length === 0 || !activePin) return;
-    const currentIndex = pins.findIndex((p) => p.id === activePin.id);
+    if (pins.length === 0 || !safeActivePin) return;
+    const currentIndex = pins.findIndex((p) => p.id === safeActivePin.id);
     const nextIndex = (currentIndex + 1) % pins.length;
     setActivePin(pins[nextIndex]);
   };
 
   const handlePrevPin = () => {
-    if (pins.length === 0 || !activePin) return;
-    const currentIndex = pins.findIndex((p) => p.id === activePin.id);
+    if (pins.length === 0 || !safeActivePin) return;
+    const currentIndex = pins.findIndex((p) => p.id === safeActivePin.id);
     const prevIndex = (currentIndex - 1 + pins.length) % pins.length;
     setActivePin(pins[prevIndex]);
   };
@@ -72,7 +67,6 @@ export default function Home() {
   const handleUpdatePinFields = (id: number, fields: Partial<MemoryPin>) => {
     const updatedPins = pins.map((p) => (p.id === id ? { ...p, ...fields } : p));
     savePins(updatedPins);
-    // Keep activePin synced
     if (activePin && activePin.id === id) {
       setActivePin({ ...activePin, ...fields });
     }
@@ -89,8 +83,8 @@ export default function Home() {
   const handleAddPin = () => {
     const nextId = pins.length > 0 ? Math.max(...pins.map((p) => p.id)) + 1 : 1;
     // Calculate a slight coordinate offset from the current active pin, or default to Charleston
-    const baseCoords: [number, number] = activePin
-      ? [activePin.coordinates[0] - 0.008, activePin.coordinates[1] - 0.008]
+    const baseCoords: [number, number] = safeActivePin
+      ? [safeActivePin.coordinates[0] - 0.008, safeActivePin.coordinates[1] - 0.008]
       : [-79.9403, 32.7161];
 
     const newPin: MemoryPin = {
@@ -138,25 +132,14 @@ export default function Home() {
   const handleImportRoute = (jsonData: string) => {
     try {
       const parsed = JSON.parse(jsonData);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        // Minimal schema verification
-        const isValid = parsed.every(
-          (p) =>
-            typeof p.id === "number" &&
-            Array.isArray(p.coordinates) &&
-            p.coordinates.length === 2 &&
-            typeof p.title === "string"
-        );
+      const validated = validateMemoryRoute(parsed);
 
-        if (isValid) {
-          savePins(parsed);
-          setActivePin(parsed[0]);
-          alert("Route imported successfully!");
-        } else {
-          alert("Invalid route JSON schema structure. Import aborted.");
-        }
+      if (validated && validated.pins.length > 0) {
+        savePins(validated.pins);
+        setActivePin(validated.pins[0]);
+        alert("Route imported successfully!");
       } else {
-        alert("JSON must contain an array of memory pins.");
+        alert("Invalid route JSON schema structure. Import aborted.");
       }
     } catch (e) {
       alert("Error parsing JSON file. Make sure it is valid JSON.");
@@ -175,7 +158,7 @@ export default function Home() {
       <div className="h-[60vh] w-full relative">
         <MemoryRideMap
           pins={pins}
-          activePin={activePin as MemoryPin}
+          activePin={safeActivePin}
           mode={mode}
           onPinSelect={handlePinSelect}
           onUpdatePinCoordinates={handleUpdatePinCoordinates}
@@ -242,7 +225,7 @@ export default function Home() {
       {/* 2. BOTTOM 40%: Memory Dashboard Controller */}
       <div className="h-[40vh] w-full">
         <MemoryDashboard
-          activePin={activePin}
+          activePin={safeActivePin}
           isPlaying={isPlaying}
           mode={mode}
           onPlayPauseToggle={handlePlayPauseToggle}

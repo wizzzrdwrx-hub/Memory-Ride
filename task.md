@@ -18,13 +18,13 @@
 
 # Creator Mode v0.1.1 Stability Polish
 
-- [ ] Empty state when no pins exist
-- [ ] Safe active-pin fallback after delete/import/reset
-- [ ] Broken image placeholder fallback
-- [ ] Stronger JSON schema validation
-- [ ] localStorage version key
-- [ ] Sample route JSON in `/public/demo-routes/`
-- [ ] README demo script
+- [x] Empty state when no pins exist
+- [x] Safe active-pin fallback after delete/import/reset
+- [x] Broken image placeholder fallback
+- [x] Stronger JSON schema validation
+- [x] localStorage version key
+- [x] Sample route JSON in `/public/demo-routes/`
+- [x] README demo script
 - [ ] Final GitHub repo verification
 
 # Creator Mode v0.2
