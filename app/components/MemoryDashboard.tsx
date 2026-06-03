@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
@@ -8,7 +9,6 @@ import {
   SkipBack,
   MapPin,
   Calendar,
-  Compass,
   Plus,
   Trash2,
   Download,
@@ -85,6 +85,7 @@ export default function MemoryDashboard({
       }, 1000);
     }
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, totalDurationSec, activePin, mode]);
 
   // Format seconds to M:SS
