@@ -33,22 +33,110 @@ The project is structured inside the `memory-ride-mvp/` folder as follows:
 * **Caching & Caching Recovery**: Auto-syncs all edits to `localStorage` with a fallback "Reset" button to reload the 1994 demo.
 * **Cassette Deck & Visual Aesthetics**: Interactive audio controller with dual rotating cassette reels.
 
----
-
-## 🛑 Not Yet Included (Out of Scope)
-* Multi-route named drawers
-* Dynamic image upload and hosting (relics on external links)
-* Microphone-based audio voice notes recording
-* User login, database storage, and account persistence
-* Live public sharing pages
+## 🚀 Build & Lint Status
+- **ESLint**: Completed successfully with 0 errors.
+- **Production Build**: Compiled successfully in Turbopack (`next build`) in 7.0s with zero TypeScript compilation warnings or issues.
 
 ---
 
-## 🚀 Best Next Technical Milestone: Creator Mode v0.2
-To extend the creation platform, the next development sprint will focus on:
-1. **Multi-Route Named Drawers**: Manage and switch between multiple named rides stored in `localStorage` through a dropdown selector.
-2. **Audio Recorder API**: Utilize the device microphone to record narrative voice logs, encoding them as base64 strings directly in the JSON file.
-3. **Local Media Base64 Conversion**: Enable selecting local files and converting them to base64 data URIs so that routes remain self-contained.
+## ✅ Manual Verification Checklist
+
+Use this checklist after pulling the branch or reviewing the PR.
+
+### App Load
+- [ ] App loads without crashing.
+- [ ] Default Charleston Battery to Folly Beach route appears.
+- [ ] Map renders when `NEXT_PUBLIC_MAPBOX_TOKEN` is present.
+- [ ] Missing Mapbox token screen appears when token is absent.
+
+### Route Library
+- [ ] `memory_ride_library` is created in localStorage.
+- [ ] `activeRouteId` points to a valid route.
+- [ ] Active route metadata appears in the header.
+- [ ] Route selector appears when more than one route exists.
+- [ ] Switching routes changes the visible pins and route line.
+
+### Legacy Migration
+- [ ] Legacy `memory_ride_pins` data migrates into a RouteLibrary.
+- [ ] Legacy `memory_ride_route` data migrates into a RouteLibrary.
+- [ ] Legacy keys are removed after successful migration.
+- [ ] If legacy data is corrupt, the app falls back to the default route safely.
+
+### Creator Mode
+- [ ] Add Stop creates a new pin inside the active route.
+- [ ] Delete Stop removes only the active route’s selected pin.
+- [ ] Editing title, year, location, image, caption, and tape length persists.
+- [ ] Dragging the active pin updates its coordinates.
+- [ ] Clicking the map in Creator Mode moves the active pin.
+- [ ] Empty route / missing active pin states do not crash the app.
+
+### Import / Export
+- [ ] Export produces valid JSON.
+- [ ] Import accepts valid route/library JSON.
+- [ ] Import rejects malformed JSON.
+- [ ] Import rejects invalid coordinates.
+- [ ] Imported data does not overwrite unrelated routes unless intended.
+
+### Security
+- [ ] No hardcoded Mapbox token exists in source.
+- [ ] `.env.local` is ignored.
+- [ ] `.env.local.example` contains only a placeholder.
+- [ ] Image fallbacks work with empty or broken image URLs.
+
+---
+
+## ⚠️ Known Limitations
+
+Creator Mode v0.2 currently establishes the Route Library foundation only.
+
+The following features are intentionally not implemented yet:
+
+- Full route creation UI
+- Full route metadata editor UI
+- Route duplication
+- Route deletion controls
+- Route cover image picker
+- Read-only Present Mode
+- Microphone recording
+- Audio file storage
+- Backend database
+- User authentication
+- Hosted media storage
+- Public/private share links
+- Collaboration permissions
+
+This release keeps the app local-first and frontend-only. The goal is to stabilize the multi-route architecture before adding media capture, sharing, or cloud persistence.
+
+---
+
+## 🧭 Next Recommended Slice: v0.2 Route Metadata UI
+
+The next development branch should be:
+
+```bash
+feat/creator-v0.2-route-metadata-ui
+```
+
+### Objective
+
+Expose route-level metadata editing in the UI without changing the storage foundation.
+
+### Planned Features
+
+* Edit active route title
+* Edit route description
+* Edit route era
+* Edit route author
+* Edit cover image URL
+* Preview route cover image using ImageWithFallback
+* Add “Create New Route” control
+* Add “Duplicate Route” control
+* Add “Delete Route” control with confirmation
+* Preserve active pin editing behavior
+
+### Deferred
+
+Do not implement audio recording, backend storage, authentication, hosted media, or public sharing in this slice.
 
 ---
 

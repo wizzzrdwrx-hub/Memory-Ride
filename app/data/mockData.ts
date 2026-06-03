@@ -1,30 +1,4 @@
-export interface MemoryPin {
-  id: number;
-  title: string;
-  coordinates: [number, number]; // [lng, lat]
-  text: string;
-  image: string;
-  locationName: string;
-  year: string;
-  audioDuration: string; // e.g., "1:45"
-}
-
-export const routeGeoJson: GeoJSON.Feature<GeoJSON.LineString> = {
-  type: "Feature",
-  properties: {
-    name: "The Battery to The Beach (1994)",
-    color: "#D97706", // Amber-600
-  },
-  geometry: {
-    type: "LineString",
-    coordinates: [
-      [-79.9261, 32.7714], // Start: East Bay Street, Charleston
-      [-79.9501, 32.7665], // Waypoint 1: James Island Expressway
-      [-79.9535, 32.7161], // Waypoint 2: Folly Road
-      [-79.9403, 32.6551], // End: 1 Center Street, Folly Beach
-    ],
-  },
-};
+import { MemoryPin, MemoryRoute } from "../types";
 
 export const memoryPins: MemoryPin[] = [
   {
@@ -68,3 +42,15 @@ export const memoryPins: MemoryPin[] = [
     audioDuration: "3:12",
   },
 ];
+
+export const defaultMemoryRoute: MemoryRoute = {
+  id: "charleston-folly-1994",
+  title: "The Battery to The Beach",
+  description: "A nostalgic summer drive from historic East Bay Street to Folly Beach, SC.",
+  era: "1994",
+  author: "Family Archive",
+  coverImage: "/images/battery.png",
+  createdAt: "2026-06-02T12:00:00.000Z",
+  updatedAt: "2026-06-02T12:00:00.000Z",
+  pins: memoryPins,
+};

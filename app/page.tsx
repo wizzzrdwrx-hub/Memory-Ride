@@ -1,44 +1,80 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useEffect } from "react";
 import MemoryRideMap from "./components/MemoryRideMap";
 import MemoryDashboard from "./components/MemoryDashboard";
-import { memoryPins } from "./data/mockData";
-import { MemoryPin, MemoryRoute } from "./types";
-import { validateMemoryRoute } from "./lib/schemas";
-import { loadRoute, saveRoute } from "./lib/storage";
+import { defaultMemoryRoute } from "./data/mockData";
+import { MemoryPin, RouteLibrary } from "./types";
+import { normalizeImportedRoute } from "./lib/schemas";
+import { loadLibrary, saveLibrary } from "./lib/storage";
 import { Compass, Disc } from "lucide-react";
 
 export default function Home() {
-  const [pins, setPins] = useState<MemoryPin[]>([]);
+  const [library, setLibrary] = useState<RouteLibrary>({
+    version: 2,
+    activeRouteId: "",
+    routes: []
+  });
   const [activePin, setActivePin] = useState<MemoryPin | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [ambientStatic, setAmbientStatic] = useState<boolean>(true);
   const [mode, setMode] = useState<"view" | "edit">("view");
 
-  // Load route state on mount using schema validator and migration helpers
+  const activeRoute = library.routes.find((r) => r.id === library.activeRouteId) || library.routes[0];
+  const pins = activeRoute ? activeRoute.pins : [];
+
+  // Load library state on mount using schema validator and migration helpers
   useEffect(() => {
-    const route = loadRoute({ version: 1, pins: memoryPins });
-    setPins(route.pins);
-    if (route.pins.length > 0) {
-      setActivePin(route.pins[0]);
+    const fallbackLibrary: RouteLibrary = {
+      version: 2,
+      activeRouteId: defaultMemoryRoute.id,
+      routes: [defaultMemoryRoute],
+    };
+    const loaded = loadLibrary(fallbackLibrary);
+    setLibrary(loaded);
+
+    const currentActiveRoute = loaded.routes.find((r) => r.id === loaded.activeRouteId) || loaded.routes[0];
+    if (currentActiveRoute && currentActiveRoute.pins.length > 0) {
+      setActivePin(currentActiveRoute.pins[0]);
     }
   }, []);
 
   const loadDefaults = () => {
-    setPins(memoryPins);
-    setActivePin(memoryPins[0] || null);
-    saveRoute({ version: 1, pins: memoryPins });
+    const fallbackLibrary: RouteLibrary = {
+      version: 2,
+      activeRouteId: defaultMemoryRoute.id,
+      routes: [defaultMemoryRoute],
+    };
+    setLibrary(fallbackLibrary);
+    saveLibrary(fallbackLibrary);
+    if (defaultMemoryRoute.pins.length > 0) {
+      setActivePin(defaultMemoryRoute.pins[0]);
+    } else {
+      setActivePin(null);
+    }
   };
 
   // State update wrapper to sync with localStorage via versioned schemas
-  const savePins = (newPins: MemoryPin[]) => {
-    setPins(newPins);
-    saveRoute({ version: 1, pins: newPins });
+  const updateActiveRoutePins = (newPins: MemoryPin[]) => {
+    if (!activeRoute) return;
+    const updatedRoutes = library.routes.map((r) =>
+      r.id === activeRoute.id
+        ? { ...r, pins: newPins, updatedAt: new Date().toISOString() }
+        : r
+    );
+    const updatedLibrary = {
+      ...library,
+      routes: updatedRoutes,
+    };
+    setLibrary(updatedLibrary);
+    saveLibrary(updatedLibrary);
   };
 
   // Safe active pin selection fallback helper
-  const safeActivePin = pins.find((p) => p.id === activePin?.id) || pins[0] || null;
+  const safeActivePin = activeRoute
+    ? (activeRoute.pins.find((p) => p.id === activePin?.id) || activeRoute.pins[0] || null)
+    : null;
 
   // Playback control handlers
   const handlePlayPauseToggle = () => {
@@ -66,7 +102,7 @@ export default function Home() {
   // Creator Mode Handlers: Add, Update fields, Update coords, Delete, Reset, Export, Import
   const handleUpdatePinFields = (id: number, fields: Partial<MemoryPin>) => {
     const updatedPins = pins.map((p) => (p.id === id ? { ...p, ...fields } : p));
-    savePins(updatedPins);
+    updateActiveRoutePins(updatedPins);
     if (activePin && activePin.id === id) {
       setActivePin({ ...activePin, ...fields });
     }
@@ -74,7 +110,7 @@ export default function Home() {
 
   const handleUpdatePinCoordinates = (id: number, coordinates: [number, number]) => {
     const updatedPins = pins.map((p) => (p.id === id ? { ...p, coordinates } : p));
-    savePins(updatedPins);
+    updateActiveRoutePins(updatedPins);
     if (activePin && activePin.id === id) {
       setActivePin({ ...activePin, coordinates });
     }
@@ -94,12 +130,12 @@ export default function Home() {
       text: "Click here to edit this memory. Drag the pin on the map or click the map surface to change its coordinates.",
       image: "",
       locationName: "New stop along the ride",
-      year: "1994",
+      year: activeRoute?.era || "1994",
       audioDuration: "1:00",
     };
 
     const newPinsList = [...pins, newPin];
-    savePins(newPinsList);
+    updateActiveRoutePins(newPinsList);
     setActivePin(newPin);
   };
 
@@ -108,7 +144,7 @@ export default function Home() {
     if (indexToDelete === -1) return;
 
     const newPinsList = pins.filter((p) => p.id !== id);
-    savePins(newPinsList);
+    updateActiveRoutePins(newPinsList);
 
     if (newPinsList.length === 0) {
       setActivePin(null);
@@ -120,10 +156,11 @@ export default function Home() {
   };
 
   const handleExportRoute = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pins, null, 2));
+    if (!activeRoute) return;
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(activeRoute, null, 2));
     const downloadAnchor = document.createElement("a");
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "memory_ride_route.json");
+    downloadAnchor.setAttribute("download", `${activeRoute.title.toLowerCase().replace(/[^a-z0-9]+/g, "_")}_route.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -132,16 +169,26 @@ export default function Home() {
   const handleImportRoute = (jsonData: string) => {
     try {
       const parsed = JSON.parse(jsonData);
-      const validated = validateMemoryRoute(parsed);
+      const normalizedRoute = normalizeImportedRoute(parsed);
 
-      if (validated && validated.pins.length > 0) {
-        savePins(validated.pins);
-        setActivePin(validated.pins[0]);
+      if (normalizedRoute && normalizedRoute.pins.length > 0) {
+        const updatedRoutes = [
+          ...library.routes.filter((r) => r.id !== normalizedRoute.id),
+          normalizedRoute,
+        ];
+        const updatedLibrary: RouteLibrary = {
+          version: 2,
+          activeRouteId: normalizedRoute.id,
+          routes: updatedRoutes,
+        };
+        setLibrary(updatedLibrary);
+        saveLibrary(updatedLibrary);
+        setActivePin(normalizedRoute.pins[0]);
         alert("Route imported successfully!");
       } else {
         alert("Invalid route JSON schema structure. Import aborted.");
       }
-    } catch (e) {
+    } catch {
       alert("Error parsing JSON file. Make sure it is valid JSON.");
     }
   };
@@ -171,11 +218,44 @@ export default function Home() {
             <span>Interactive Road-Trip Archive</span>
           </div>
           <h1 className="text-lg md:text-xl font-extrabold text-stone-900 leading-tight">
-            The Battery to The Beach
+            {activeRoute?.title || "Untitled Memory Ride"}
           </h1>
           <p className="text-[11px] md:text-xs text-stone-500 font-sans mt-0.5">
-            Summer Road Trip • Charleston, SC • June 1994
+            {activeRoute?.description || "A custom nostalgic memory ride."}
+            {activeRoute?.era || activeRoute?.author ? " • " : ""}
+            {[activeRoute?.era, activeRoute?.author].filter(Boolean).join(" • ")}
           </p>
+
+          {/* Minimal Route Selector UI */}
+          {library.routes.length > 1 && (
+            <div className="mt-3 pt-2 border-t border-stone-200/50">
+              <label className="block text-[9px] uppercase font-sans text-stone-400 font-bold tracking-widest mb-1">
+                Select Memory Ride
+              </label>
+              <select
+                value={library.activeRouteId}
+                onChange={(e) => {
+                  const newActiveId = e.target.value;
+                  const newLibrary = { ...library, activeRouteId: newActiveId };
+                  setLibrary(newLibrary);
+                  saveLibrary(newLibrary);
+                  const selectedRoute = library.routes.find((r) => r.id === newActiveId);
+                  if (selectedRoute && selectedRoute.pins.length > 0) {
+                    setActivePin(selectedRoute.pins[0]);
+                  } else {
+                    setActivePin(null);
+                  }
+                }}
+                className="w-full text-xs font-sans p-1.5 bg-stone-100/80 border border-stone-300/65 rounded text-stone-800 focus:outline-none focus:ring-1 focus:ring-amber-700"
+              >
+                {library.routes.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.title} ({r.era})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Mode Toggles */}
           <div className="flex items-center space-x-2 mt-3 pt-3 border-t border-stone-200/50">

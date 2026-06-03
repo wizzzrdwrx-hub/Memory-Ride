@@ -10,8 +10,19 @@ export interface MemoryPin {
 }
 
 export interface MemoryRoute {
-  version: number;
+  id: string; // Unique route identifier
+  title: string;
+  description: string;
+  era: string; // e.g., "1994"
+  author: string;
+  coverImage: string; // URL path or base64 preview
+  createdAt: string; // ISO string
+  updatedAt: string; // ISO string
   pins: MemoryPin[];
-  title?: string;
-  description?: string;
+}
+
+export interface RouteLibrary {
+  version: number;
+  activeRouteId: string;
+  routes: MemoryRoute[];
 }

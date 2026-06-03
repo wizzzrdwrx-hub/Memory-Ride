@@ -50,6 +50,7 @@ export default function MemoryRideMap({
       : null;
 
   // Handle click on map surface to reposition active pin in edit mode
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleMapClick = (e: any) => {
     if (mode === "edit" && activePin) {
       const coords: [number, number] = [e.lngLat.lng, e.lngLat.lat];

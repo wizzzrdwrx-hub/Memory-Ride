@@ -1,64 +1,93 @@
-import { MemoryRoute } from "../types";
-import { validateMemoryRoute } from "./schemas";
+import { RouteLibrary } from "../types";
+import { validateRouteLibrary, normalizeImportedRoute } from "./schemas";
 
-const STORAGE_KEY = "memory_ride_route";
-const LEGACY_STORAGE_KEY = "memory_ride_pins";
-const STORAGE_VERSION = 1;
+const STORAGE_KEY = "memory_ride_library";
+const LEGACY_ROUTE_KEY = "memory_ride_route";
+const LEGACY_PINS_KEY = "memory_ride_pins";
+const STORAGE_VERSION = 2; // Version 2 maps to RouteLibrary schema
 
 /**
- * Loads route data from localStorage, running migrations and validations
+ * Loads the route library from localStorage, performing migrations and validations
  */
-export const loadRoute = (fallback: MemoryRoute): MemoryRoute => {
+export const loadLibrary = (fallback: RouteLibrary): RouteLibrary => {
   if (typeof window === "undefined") return fallback;
 
-  // 1. Try parsing updated route structure
-  const storedRoute = localStorage.getItem(STORAGE_KEY);
+  // 1. Try loading existing v0.2 Route Library
+  const storedLibrary = localStorage.getItem(STORAGE_KEY);
+  if (storedLibrary) {
+    try {
+      const parsed = JSON.parse(storedLibrary);
+      if (validateRouteLibrary(parsed) && parsed.version === STORAGE_VERSION) {
+        return parsed;
+      }
+    } catch {
+      // Fall through to removal
+    }
+    localStorage.removeItem(STORAGE_KEY);
+  }
+
+  // 2. Try migrating v0.1.1 route file structure
+  const storedRoute = localStorage.getItem(LEGACY_ROUTE_KEY);
   if (storedRoute) {
     try {
       const parsed = JSON.parse(storedRoute);
-      const validated = validateMemoryRoute(parsed);
-      if (validated && validated.version === STORAGE_VERSION) {
-        return validated;
+      const normalizedRoute = normalizeImportedRoute(parsed);
+      if (normalizedRoute) {
+        const migratedLibrary: RouteLibrary = {
+          version: STORAGE_VERSION,
+          activeRouteId: normalizedRoute.id,
+          routes: [normalizedRoute],
+        };
+        // Save new library and clean up old keys
+        saveLibrary(migratedLibrary);
+        localStorage.removeItem(LEGACY_ROUTE_KEY);
+        localStorage.removeItem(LEGACY_PINS_KEY);
+        return migratedLibrary;
       }
-    } catch (e) {
-      // Degrade gracefully
+    } catch {
+      // Cascade to legacy pins
     }
   }
 
-  // 2. Try migrating legacy array schema from v0.1
-  const storedLegacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-  if (storedLegacy) {
+  // 3. Try migrating v0.1 legacy pins array
+  const storedPins = localStorage.getItem(LEGACY_PINS_KEY);
+  if (storedPins) {
     try {
-      const parsed = JSON.parse(storedLegacy);
-      const validated = validateMemoryRoute(parsed);
-      if (validated) {
-        // Migrate to new storage key and clear legacy key
-        saveRoute(validated);
-        localStorage.removeItem(LEGACY_STORAGE_KEY);
-        return validated;
+      const parsed = JSON.parse(storedPins);
+      const normalizedRoute = normalizeImportedRoute(parsed);
+      if (normalizedRoute) {
+        const migratedLibrary: RouteLibrary = {
+          version: STORAGE_VERSION,
+          activeRouteId: normalizedRoute.id,
+          routes: [normalizedRoute],
+        };
+        saveLibrary(migratedLibrary);
+        localStorage.removeItem(LEGACY_ROUTE_KEY);
+        localStorage.removeItem(LEGACY_PINS_KEY);
+        return migratedLibrary;
       }
-    } catch (e) {
+    } catch {
       // Migration failed
     }
   }
 
-  // 3. Fallback to defaults
+  // 4. Return default fallback library
+  saveLibrary(fallback);
   return fallback;
 };
 
 /**
- * Saves route data to localStorage securely
+ * Saves the route library to localStorage securely
  */
-export const saveRoute = (route: MemoryRoute): void => {
+export const saveLibrary = (library: RouteLibrary): void => {
   if (typeof window === "undefined") return;
   try {
     const data = {
-      ...route,
+      ...library,
       version: STORAGE_VERSION,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
-    console.error("Failed to save route to localStorage:", e);
+    console.error("Failed to save RouteLibrary to localStorage:", e);
   }
 };
-export type { MemoryRoute };
