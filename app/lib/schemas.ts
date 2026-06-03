@@ -1,43 +1,54 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MemoryPin, MemoryRoute, RouteLibrary } from "../types";
-
 
 /**
  * Validates a single memory pin structure and data types
  */
-export const validateMemoryPin = (pin: any): pin is MemoryPin => {
+export const validateMemoryPin = (pin: unknown): pin is MemoryPin => {
   if (!pin || typeof pin !== "object") return false;
+  
+  const p = pin as Partial<MemoryPin>;
+  
   return (
-    typeof pin.id === "number" &&
-    typeof pin.title === "string" &&
-    Array.isArray(pin.coordinates) &&
-    pin.coordinates.length === 2 &&
-    typeof pin.coordinates[0] === "number" &&
-    typeof pin.coordinates[1] === "number" &&
-    typeof pin.text === "string" &&
-    typeof pin.image === "string" &&
-    typeof pin.locationName === "string" &&
-    typeof pin.year === "string" &&
-    typeof pin.audioDuration === "string"
+    typeof p.id === "number" &&
+    Number.isInteger(p.id) &&
+    typeof p.title === "string" &&
+    Array.isArray(p.coordinates) &&
+    p.coordinates.length === 2 &&
+    typeof p.coordinates[0] === "number" &&
+    Number.isFinite(p.coordinates[0]) &&
+    p.coordinates[0] >= -180 &&
+    p.coordinates[0] <= 180 &&
+    typeof p.coordinates[1] === "number" &&
+    Number.isFinite(p.coordinates[1]) &&
+    p.coordinates[1] >= -90 &&
+    p.coordinates[1] <= 90 &&
+    typeof p.text === "string" &&
+    typeof p.image === "string" &&
+    typeof p.locationName === "string" &&
+    typeof p.year === "string" &&
+    typeof p.audioDuration === "string"
   );
 };
 
 /**
  * Validates a complete MemoryRoute object (strict v0.2 check)
  */
-export const validateMemoryRoute = (route: any): route is MemoryRoute => {
+export const validateMemoryRoute = (route: unknown): route is MemoryRoute => {
   if (!route || typeof route !== "object") return false;
+  
+  const r = route as Partial<MemoryRoute>;
+  
   return (
-    typeof route.id === "string" &&
-    typeof route.title === "string" &&
-    typeof route.description === "string" &&
-    typeof route.era === "string" &&
-    typeof route.author === "string" &&
-    typeof route.coverImage === "string" &&
-    typeof route.createdAt === "string" &&
-    typeof route.updatedAt === "string" &&
-    Array.isArray(route.pins) &&
-    route.pins.every(validateMemoryPin)
+    typeof r.id === "string" &&
+    typeof r.title === "string" &&
+    typeof r.description === "string" &&
+    typeof r.era === "string" &&
+    typeof r.author === "string" &&
+    typeof r.coverImage === "string" &&
+    typeof r.createdAt === "string" &&
+    typeof r.updatedAt === "string" &&
+    Array.isArray(r.pins) &&
+    r.pins.every(validateMemoryPin)
   );
 };
 
@@ -76,18 +87,19 @@ export const normalizeImportedRoute = (data: unknown): MemoryRoute | null => {
 
   // 2. If it is a v0.1.1 MemoryRoute wrapper (with version: 1 and pins)
   if (typeof data === "object") {
-    const obj = data as Record<string, any>;
+    const obj = data as Record<string, unknown>;
     if (Array.isArray(obj.pins)) {
-      const validPins = obj.pins.filter(validateMemoryPin);
+      const pinsArray = obj.pins as unknown[];
+      const validPins = pinsArray.filter(validateMemoryPin);
       if (validPins.length > 0) {
         return {
-          id: obj.id || `route-${Date.now()}`,
-          title: obj.title || "Migrated Ride",
-          description: obj.description || "Story migrated from legacy format.",
+          id: (obj.id as string) || `route-${Date.now()}`,
+          title: (obj.title as string) || "Migrated Ride",
+          description: (obj.description as string) || "Story migrated from legacy format.",
           era: validPins[0]?.year || "1994",
           author: "Family Archivist",
           coverImage: validPins[0]?.image || "/images/battery.png",
-          createdAt: obj.createdAt || new Date().toISOString(),
+          createdAt: (obj.createdAt as string) || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           pins: validPins,
         };
