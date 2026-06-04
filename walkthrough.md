@@ -1,9 +1,9 @@
-# Walkthrough: Memory Ride MVP (Project Opal) - v0.3 Hx Strength UI
+# Walkthrough: Memory Ride MVP (Project Opal) - v0.3 Confidence Haptics Foundation
 
 ## 🎯 MVP Purpose
 Memory Ride is a proof-of-concept for turning family photos, meaningful locations, and personal narration into a shareable guided route experience. 
 
-This slice introduces the **v0.3 Hx Strength UI** which provides a visual, analog-style indicator (gauge/meter) communicating the historical integrity and reconstruction confidence of stops and temporal layers.
+This slice introduces **v0.3 Confidence Haptics Foundation**, which visually degrades or sharpens Polaroid photos and dashboard review cards depending on the historical integrity and reconstruction confidence (`hxStrength`) of active time-layers.
 
 ---
 
@@ -11,49 +11,45 @@ This slice introduces the **v0.3 Hx Strength UI** which provides a visual, analo
 The project is structured inside the `memory-ride-mvp/` folder as follows:
 
 - [package.json](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/package.json) - Contains React 19, Next.js 16, `@types/mapbox-gl`, `react-map-gl`, and `lucide-react`.
-- [HxStrengthMeter.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/components/HxStrengthMeter.tsx) - [NEW] Contains the dial gauge layout, CSS transition-based white needle, linear gradient confidence scale, warm glowing tube bulb (active for temporal layers, dark for base memories), and monospace stats dashboard.
-- [MemoryDashboard.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/components/MemoryDashboard.tsx) - [MODIFY] Integrates the `HxStrengthMeter` component across View, Present, and Creator modes (replacing raw metadata boxes with a cohesive instrument UI).
-- [mockData.ts](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/data/mockData.ts) - Pre-populated with Crosby's Seafood temporal perspective layers (1994, 2016, and 2024), containing valid `hxStrength`, `confidence` labels, and `sourceNote` records.
-- [MemoryRideMap.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/components/MemoryRideMap.tsx) - Visual map representation displaying stop pins.
-- [page.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/page.tsx) - App shell coordinating state hooks and active route switches.
+- [globals.css](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/globals.css) - [MODIFY] Added visual scanline gradients for Medium and Low Hx, pulse animations for amber and red glow borders, and prefers-reduced-motion media query overrides.
+- [HxStrengthMeter.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/components/HxStrengthMeter.tsx) - [MODIFY] Derived `hapticState` internally, styled the outer chassis borders/inner shadows matching the tier, and added a microcopy disclaimer.
+- [MemoryDashboard.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/components/MemoryDashboard.tsx) - [MODIFY] Computed the haptic state at the top level and dynamically applied CSS classes/filters/overlays to the Polaroid frame wrapper, inner photo container, image elements, and Creator Mode Perspective review card.
+- [mockData.ts](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/data/mockData.ts) - [MODIFY] Inserted a fourth Crosby's Seafood temporal perspective (1970s Hearsay) with a low `hxStrength` (0.48) to demonstrate the Low Hx haptic state.
 
 ---
 
-## 📋 Current MVP Scope (v0.3 Hx Strength UI Complete)
-* **Analog Dashboard / Tuner Meter**:
-  * Designed using pure CSS/HTML/Tailwind (no external charting dependencies).
-  * Styled with a dark scratched-metal/tape-scanline background, linear color scale (red $\rightarrow$ amber $\rightarrow$ green), and subtle layout marking ticks.
-  * Incorporates a white indicator needle with dynamic `style={{ left: ... }}` offset transitions for smooth shifting motion.
-  * Warm orange status bulb representing tube warmup (active and pulsating for temporal layers; dark for base memories).
-* **View & Present Modes**:
-  * Renders the `HxStrengthMeter` component at the base of the active stop narrative cards.
-  * Transitioning between temporal years slides the dial pointer needle to the target strength (e.g. 72%, 84%, 92%) and swaps the info panel readouts.
-  * In base stop view, renders a neutral/inactive state with the pointer hidden, reading "Base Memory" and showing default reference sourcing.
-* **Creator Mode Preview**:
-  * Integrates the read-only `HxStrengthMeter` component within the temporal perspective review panel.
-  * Safely displays perspective integrity details without providing editing controls for `hxStrength` yet (read-only alignment).
+## 📋 Current MVP Scope (v0.3 Confidence Haptics Complete)
+* **Confidence Haptics Thresholds**:
+  * **Neutral** (Base Stop): Clear image, no degradation, instrument shows N/A, tube warmup indicator remains dark.
+  * **High Hx** (`hxStrength >= 0.85`, e.g. 2024 at 92%): Emerald highlighted outline wrapper, sharp grayscale-0 image.
+  * **Medium Hx** (`0.60 <= hxStrength < 0.85`, e.g. 2016 at 84%, 1994 at 72%): Pulsing amber glow border around the Polaroid, mild image softness (`blur-[0.3px]`, `contrast-[98%]`), and fine-grain amber scanlines.
+  * **Low Hx** (`hxStrength < 0.60`, e.g. 1970 at 48%): Faint red pulsing glow border, pronounced image blur (`blur-[0.8px]`), sepia fade mix (`sepia-[15%]`), reduced opacity, and paper-noise scanline overlay representing temporal decay.
+* **UI copy**:
+  * Added the following warning label to the Hx Strength Meter footer:
+    > "✦ Confidence Haptics use subtle visual atmosphere to show how strongly this time-layer is supported."
+* **Accessibility & Usability Safeguards**:
+  * Visual effects apply strictly to image containers and background frames; no blur or opacity changes affect narrative text blocks.
+  * Animation pulses check for user preferences via `@media (prefers-reduced-motion: reduce)` to disable layout transitions if necessary.
+  * Avoided any strobe, flicker, or high-frequency animations.
 
 ---
 
 ## 🚀 Build & Lint Status
-- **ESLint**: Completed successfully with 0 errors (with minor Next.js image optimization warnings on standard img tags in map elements).
-- **Production Build**: Compiled successfully in Next.js Turbopack (`next build`) in ~50s with zero TypeScript compilation errors or static generation issues.
+- **ESLint**: Completed successfully with 0 errors (standard native image warnings in fallback elements only).
+- **Production Build**: Compiled successfully in Turbopack (`next build`) in ~23s with zero TypeScript compilation errors or static generation issues.
 
 ---
 
 ## ✅ QA Checklist
 
-- [x] Selecting a stop with temporal perspectives (Crosby's Seafood) displays the new analog dial meter.
-- [x] Switching between perspective pills (1994, 2016, 2024) triggers:
-  - [x] Smooth slider needle transition to the respective percent value.
-  - [x] Tube warmup bulb pulses with amber neon glow.
-  - [x] Readout panels show the correct percentage (e.g. 1994 = 72%, 2016 = 84%, 2024 = 92%).
-  - [x] Sourcing note updates dynamically to display the image origin info.
-- [x] Selecting "Base Memory" or switching to a stop without temporal perspectives triggers:
-  - [x] Inactive state where the pointer needle is completely hidden/rested.
-  - [x] Tube warmup indicator goes dark.
-  - [x] Stats panel reads "Base Memory" and "N/A" for integrity.
-- [x] Present Mode displays the gauge exactly as intended (read-only, responsive layout).
-- [x] Creator Mode renders the exact same gauge layout within the read-only perspective review card.
-- [x] `cmd /c npm run lint` completes with 0 errors.
-- [x] `cmd /c npm run build` succeeds cleanly.
+- [x] Base Stop shows neutral haptic state (sharp image, dark tube light, N/A meter).
+- [x] Crosby’s 1994 layer (`hxStrength` = 0.72) displays Medium haptic state (amber pulsing outline, scanlines, blur 0.3px).
+- [x] Crosby’s 2016 layer (`hxStrength` = 0.84) displays Medium haptic state.
+- [x] Crosby’s 2024 layer (`hxStrength` = 0.92) displays High haptic state (emerald highlighted outline, sharp photo).
+- [x] Crosby's 1970 layer (`hxStrength` = 0.48) displays Low haptic state (red outline, blur 0.8px, sepia tone, paper noise overlay).
+- [x] Text elements remain sharp and readable across all views.
+- [x] Changing perspective tabs updates visual haptic elements instantly.
+- [x] Changing active stop resets selected perspective to base memory.
+- [x] View, Present, and Creator modes function normally.
+- [x] `cmd /c npm run lint` passes.
+- [x] `cmd /c npm run build` passes.

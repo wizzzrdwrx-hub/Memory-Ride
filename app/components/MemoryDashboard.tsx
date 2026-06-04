@@ -70,6 +70,16 @@ export default function MemoryDashboard({
     ? activePin.temporalPerspectives?.find((p) => p.id === selectedPerspectiveId)
     : null;
 
+  // Derive confidence haptic state based on active perspective's hxStrength
+  const getConfidenceHapticState = (hxStrength?: number): "neutral" | "low" | "medium" | "high" => {
+    if (!activePerspective || hxStrength === undefined) return "neutral";
+    if (hxStrength >= 0.85) return "high";
+    if (hxStrength >= 0.60) return "medium";
+    return "low";
+  };
+
+  const hapticState = getConfidenceHapticState(activePerspective?.hxStrength);
+
   // Simulated playback time tracking
   const [playProgress, setPlayProgress] = useState(0); // 0 to 100
   const [currentTimeSec, setCurrentTimeSec] = useState(0);
@@ -182,26 +192,54 @@ export default function MemoryDashboard({
             ? "Route Cover"
             : (activePin?.locationName ? activePin.locationName.split(",")[0] : `Stop #${activePin?.id}`);
 
-          return (
-            <div className="relative bg-white p-3 pb-8 rounded shadow-xl border border-stone-200/60 max-w-[220px] transform -rotate-1 hover:rotate-0 transition-transform duration-300">
-              {/* Faded Photo Container */}
-              <div className="relative aspect-square w-48 bg-stone-200 overflow-hidden shadow-inner border border-stone-100 flex items-center justify-center">
-                <ImageWithFallback
-                  src={previewImage}
-                  alt={previewTitle}
-                  className="w-full h-full object-cover transition-opacity duration-500 grayscale-[15%] contrast-[105%]"
-                  fallbackClassName="aspect-square"
-                />
-                {/* Retro Film Light Leak & Tint */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/10 via-transparent to-red-400/5 mix-blend-overlay"></div>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,237,213,0.15),transparent)]"></div>
+            // Style Polaroid frame wrapper based on haptic state
+            let polaroidFrameClass = "relative bg-white p-3 pb-8 rounded shadow-xl border border-stone-200/60 max-w-[220px] transform -rotate-1 hover:rotate-0 transition-all duration-500";
+            if (!showRoutePreview) {
+              if (hapticState === "high") {
+                polaroidFrameClass += " shadow-[0_0_12px_rgba(16,185,129,0.08)] border-emerald-100/50";
+              } else if (hapticState === "medium") {
+                polaroidFrameClass += " haptic-pulse-amber";
+              } else if (hapticState === "low") {
+                polaroidFrameClass += " haptic-pulse-red";
+              }
+            }
+
+            return (
+              <div className={polaroidFrameClass}>
+                {/* Faded Photo Container */}
+                <div className={`relative aspect-square w-48 bg-stone-200 overflow-hidden shadow-inner border border-stone-100 flex items-center justify-center transition-all duration-500 ${
+                  !showRoutePreview && hapticState === "medium" ? "haptic-scanlines-medium" : ""
+                } ${
+                  !showRoutePreview && hapticState === "low" ? "haptic-scanlines-low" : ""
+                }`}>
+                  <ImageWithFallback
+                    src={previewImage}
+                    alt={previewTitle}
+                    className={`w-full h-full object-cover transition-all duration-500 ${
+                      showRoutePreview || hapticState === "neutral" ? "grayscale-[15%] contrast-[105%]" : ""
+                    }  ${
+                      !showRoutePreview && hapticState === "high" ? "grayscale-0 contrast-[102%]" : ""
+                    }  ${
+                      !showRoutePreview && hapticState === "medium" ? "grayscale-[10%] contrast-[98%] blur-[0.3px]" : ""
+                    }  ${
+                      !showRoutePreview && hapticState === "low" ? "grayscale-[35%] contrast-[90%] blur-[0.8px] opacity-90" : ""
+                    }`}
+                    fallbackClassName="aspect-square"
+                  />
+                  {/* Subtle paper noise overlay for Low Hx layer */}
+                  {!showRoutePreview && hapticState === "low" && (
+                    <div className="absolute inset-0 paper-noise opacity-15 pointer-events-none mix-blend-color-burn"></div>
+                  )}
+                  {/* Retro Film Light Leak & Tint */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/10 via-transparent to-red-400/5 mix-blend-overlay"></div>
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,237,213,0.15),transparent)]"></div>
+                </div>
+                {/* Polaroid Title/Caption */}
+                <div className="absolute bottom-2 left-0 right-0 text-center font-sans text-[10px] text-stone-400 tracking-widest uppercase font-bold max-w-[90%] mx-auto truncate">
+                  {previewCaption}
+                </div>
               </div>
-              {/* Polaroid Title/Caption */}
-              <div className="absolute bottom-2 left-0 right-0 text-center font-sans text-[10px] text-stone-400 tracking-widest uppercase font-bold max-w-[90%] mx-auto truncate">
-                {previewCaption}
-              </div>
-            </div>
-          );
+            );
         })()}
       </div>
 
@@ -509,25 +547,40 @@ export default function MemoryDashboard({
                       </div>
                     )}
 
-                    {activePerspective && (
-                      <div className="p-2.5 bg-amber-50/60 border border-amber-200/80 rounded space-y-1.5 text-[10px] font-sans mb-2 shadow-sm">
-                        <div className="font-bold text-amber-900 flex items-center">
-                          <span className="mr-1">👁️</span> Perspective Review Card: {activePerspective.title} ({activePerspective.year})
+                    {activePerspective && (() => {
+                      let cardBgClass = "bg-stone-50/60 border-stone-200/80 text-stone-900";
+                      let cardHeaderClass = "text-stone-850";
+                      if (hapticState === "high") {
+                        cardBgClass = "bg-emerald-50/40 border-emerald-200/60";
+                        cardHeaderClass = "text-emerald-900";
+                      } else if (hapticState === "medium") {
+                        cardBgClass = "bg-amber-50/50 border-amber-200/70";
+                        cardHeaderClass = "text-amber-900";
+                      } else if (hapticState === "low") {
+                        cardBgClass = "bg-rose-50/50 border-rose-200/70";
+                        cardHeaderClass = "text-rose-950";
+                      }
+
+                      return (
+                        <div className={`p-2.5 border rounded space-y-1.5 text-[10px] font-sans mb-2 shadow-sm transition-all duration-500 ${cardBgClass}`}>
+                          <div className={`font-bold flex items-center ${cardHeaderClass}`}>
+                            <span className="mr-1">👁️</span> Perspective Review Card: {activePerspective.title} ({activePerspective.year})
+                          </div>
+                          <p className="italic text-stone-700 font-serif leading-relaxed">
+                            &ldquo;{activePerspective.text}&rdquo;
+                          </p>
+                          <HxStrengthMeter
+                            hxStrength={activePerspective.hxStrength}
+                            confidence={activePerspective.confidence}
+                            sourceNote={activePerspective.sourceNote}
+                            isBase={false}
+                          />
+                          <p className="text-[8px] text-stone-400 leading-tight">
+                            *Editing is locked on this perspective preview. Modifications to coordinates or properties below will write directly to the base stop anchor.
+                          </p>
                         </div>
-                        <p className="italic text-stone-700 font-serif leading-relaxed">
-                          &ldquo;{activePerspective.text}&rdquo;
-                        </p>
-                        <HxStrengthMeter
-                          hxStrength={activePerspective.hxStrength}
-                          confidence={activePerspective.confidence}
-                          sourceNote={activePerspective.sourceNote}
-                          isBase={false}
-                        />
-                        <p className="text-[8px] text-stone-400 leading-tight">
-                          *Editing is locked on this perspective preview. Modifications to coordinates or properties below will write directly to the base stop anchor.
-                        </p>
-                      </div>
-                    )}
+                      );
+                    })()}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="flex flex-col space-y-1">

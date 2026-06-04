@@ -20,6 +20,16 @@ export default function HxStrengthMeter({
   const displayStrength = hasStrength ? hxStrength! : 0;
   const percentage = Math.round(displayStrength * 100);
 
+  // Derive confidence haptic state internally
+  const getConfidenceHapticState = (val?: number): "neutral" | "low" | "medium" | "high" => {
+    if (isBase || val === undefined) return "neutral";
+    if (val >= 0.85) return "high";
+    if (val >= 0.60) return "medium";
+    return "low";
+  };
+
+  const hapticState = getConfidenceHapticState(hxStrength);
+
   // Confidence label resolver
   const displayConfidence = isBase 
     ? "Base Memory" 
@@ -30,8 +40,23 @@ export default function HxStrengthMeter({
     ? "Primary spatial stop anchor."
     : (sourceNote || "No reference note recorded.");
 
+  // Styling based on haptic state
+  let borderClass = "border-stone-950";
+  let glowClass = "shadow-inner shadow-black/80";
+
+  if (hapticState === "high") {
+    borderClass = "border-emerald-950/60";
+    glowClass = "shadow-[inset_0_0_12px_rgba(16,185,129,0.05)]";
+  } else if (hapticState === "medium") {
+    borderClass = "border-amber-950/80";
+    glowClass = "shadow-[inset_0_0_12px_rgba(245,158,11,0.07)]";
+  } else if (hapticState === "low") {
+    borderClass = "border-red-950/80";
+    glowClass = "shadow-[inset_0_0_12px_rgba(239,68,68,0.05)]";
+  }
+
   return (
-    <div className="mt-4 p-3.5 bg-stone-900 border border-stone-950 rounded-lg text-stone-300 font-mono shadow-inner shadow-black/80 relative overflow-hidden select-none max-w-xl">
+    <div className={`mt-4 p-3.5 bg-stone-900 border ${borderClass} rounded-lg text-stone-300 font-mono ${glowClass} relative overflow-hidden select-none max-w-xl transition-all duration-500`}>
       {/* Tape Static / Scratch Aesthetic Layer */}
       <div className="absolute inset-0 pointer-events-none opacity-5 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:100%_4px]"></div>
 
@@ -103,6 +128,11 @@ export default function HxStrengthMeter({
         <div>
           <span className="text-stone-600 font-sans italic leading-tight block">
             “Hx Strength reflects how strongly this time-layer is supported by memory, source images, or reference material.”
+          </span>
+        </div>
+        <div className="mt-1 border-t border-stone-850/50 pt-1">
+          <span className="text-amber-500/80 font-sans leading-tight block text-[8px] uppercase tracking-wider">
+            ✦ Confidence Haptics use subtle visual atmosphere to show how strongly this time-layer is supported.
           </span>
         </div>
       </div>

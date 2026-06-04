@@ -1,21 +1,23 @@
-# Task: v0.3 Hx Strength UI
+# Task: v0.3 Confidence Haptics Foundation
 
-- [x] Create HxStrengthMeter component:
-  - [x] Analog dashboard / tuner meter style.
-  - [x] Red to amber to green gradient confidence scale.
-  - [x] Smooth pointer needle sliding effect (via CSS left transition).
-  - [x] Warm amber tube glow simulation (active when perspective is selected, pulsed).
-  - [x] Monospace data readout panel (integrity %, confidence, source).
-  - [x] Scratched-metal/tape static scanline theme compatible with existing scrapbook style.
-- [x] Integrate HxStrengthMeter in View Mode:
-  - [x] Show Hx meter when viewing a stop.
-  - [x] If perspective is selected, show that perspective's Hx data (percentage, confidence, source note).
-  - [x] If base stop is selected, show neutral/base state (base memory indicator, needle rested/hidden).
-- [x] Integrate HxStrengthMeter in Present Mode:
-  - [x] Show the same Hx meter, presentation-friendly and read-only.
-- [x] Integrate HxStrengthMeter in Creator Mode:
-  - [x] Show the same Hx meter inside the read-only temporal perspective preview panel.
-  - [x] Do not build editing controls for hxStrength yet.
+- [x] Define haptic thresholds and getConfidenceHapticState helper function:
+  - [x] high: `hxStrength >= 0.85`
+  - [x] medium: `0.60 <= hxStrength < 0.85`
+  - [x] low: `hxStrength < 0.60`
+  - [x] neutral: no selected perspective or no hxStrength
+- [x] Set up CSS classes in `app/globals.css`:
+  - [x] Define Medium Hx scanlines and pulsing amber border glow.
+  - [x] Define Low Hx scanlines, pulsing red border glow, and paper noise.
+  - [x] Add `@media (prefers-reduced-motion: reduce)` support to suppress animation loops.
+- [x] Integrate atmosphere styling into `app/components/MemoryDashboard.tsx`:
+  - [x] Apply custom classes to the Polaroid image container wrapper.
+  - [x] Apply filters (blur, grayscale, sepia, contrast) to the Polaroid image based on the haptic state.
+  - [x] Apply dynamic panel backgrounds and border colors to Creator Mode's Perspective Review Card.
+- [x] Integrate atmosphere styling into `app/components/HxStrengthMeter.tsx`:
+  - [x] Shift meter frame borders/shadows to match the haptic tier (emerald for high, amber for medium, red/dark red for low).
+  - [x] Add helper line copy explaining Confidence Haptics to the footer.
+- [x] Inject a Low Hx test perspective into `app/data/mockData.ts`:
+  - [x] Setup a 1970s family lore perspective on Crosby's Seafood with a low strength (0.48) to exercise the low haptic tier.
 - [x] Verification:
   - [x] Run `cmd /c npm run lint`
   - [x] Run `cmd /c npm run build`

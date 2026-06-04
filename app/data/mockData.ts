@@ -75,6 +75,17 @@ export const memoryPins: MemoryPin[] = [
         sourceNote: "Uploaded 2024 reference image.",
         confidence: "current-reference",
         hxStrength: 0.92
+      },
+      {
+        id: "crosbys-1970",
+        year: "1970",
+        label: "Family hearsay lore",
+        title: "Crosby’s Seafood, 1970s",
+        text: "Uncle Robert claimed he saw a ghost shrimp boat docked here during the hurricane of '72. Faded local lore, mostly fog and pluff mud whispers.",
+        image: "/images/crosbys_1994.jpg",
+        sourceNote: "Oral transcription from family interview.",
+        confidence: "hearsay / unverified",
+        hxStrength: 0.48
       }
     ]
   },
