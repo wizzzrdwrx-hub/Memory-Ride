@@ -1,29 +1,21 @@
-# Task: v0.3 Light Over Time Foundation
+# Task: v0.3 Hx Strength UI
 
-- [x] Copy Crosby's Seafood uploaded era images into `public/images/`:
-  - [x] Copy `media__1780524259779.jpg` to `crosbys_1994.jpg`
-  - [x] Copy `media__1780524272169.jpg` to `crosbys_2016.jpg`
-  - [x] Copy `media__1780524272228.jpg` to `crosbys_2024.jpg`
-- [x] Extend data models in `app/types/index.ts`:
-  - [x] Define `TemporalPerspective` type.
-  - [x] Add optional `temporalPerspectives?: TemporalPerspective[]` to `MemoryPin`.
-- [x] Implement schema validation in `app/lib/schemas.ts`:
-  - [x] Implement `validateTemporalPerspective` type check.
-  - [x] Update `validateMemoryPin` to validate `temporalPerspectives` if present.
-- [x] Inject Crosby's Seafood perspectives in `app/data/mockData.ts`:
-  - [x] Setup 1994, 2016, and 2024 layers with corresponding text narrative, metadata details, and public image references.
-- [x] Wire state coordination in `app/page.tsx`:
-  - [x] Add `selectedPerspectiveId` state hook.
-  - [x] Reset selector on active pin switches.
-  - [x] Pass prop dependencies to child components.
-- [x] Update Map in `app/components/MemoryRideMap.tsx`:
-  - [x] Resolve active perspective image and title for the active stop.
-  - [x] Verify pin coordinates remain fixed.
-- [x] Update Dashboard in `app/components/MemoryDashboard.tsx`:
-  - [x] Render selector pills row for stops containing perspectives in View/Present modes.
-  - [x] Update stop metadata display (Calendar year, Stop Title, Description narrative).
-  - [x] Add perspective metadata footer detailing Source, Confidence, and Nostalgia Strength.
-  - [x] Add Selector and read-only Preview Card inside the Stop Editor in Creator Mode.
+- [x] Create HxStrengthMeter component:
+  - [x] Analog dashboard / tuner meter style.
+  - [x] Red to amber to green gradient confidence scale.
+  - [x] Smooth pointer needle sliding effect (via CSS left transition).
+  - [x] Warm amber tube glow simulation (active when perspective is selected, pulsed).
+  - [x] Monospace data readout panel (integrity %, confidence, source).
+  - [x] Scratched-metal/tape static scanline theme compatible with existing scrapbook style.
+- [x] Integrate HxStrengthMeter in View Mode:
+  - [x] Show Hx meter when viewing a stop.
+  - [x] If perspective is selected, show that perspective's Hx data (percentage, confidence, source note).
+  - [x] If base stop is selected, show neutral/base state (base memory indicator, needle rested/hidden).
+- [x] Integrate HxStrengthMeter in Present Mode:
+  - [x] Show the same Hx meter, presentation-friendly and read-only.
+- [x] Integrate HxStrengthMeter in Creator Mode:
+  - [x] Show the same Hx meter inside the read-only temporal perspective preview panel.
+  - [x] Do not build editing controls for hxStrength yet.
 - [x] Verification:
   - [x] Run `cmd /c npm run lint`
   - [x] Run `cmd /c npm run build`

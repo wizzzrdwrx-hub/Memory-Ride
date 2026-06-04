@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { MemoryPin, MemoryRoute, ImageSourceType, AudioSourceType } from "../types";
 import ImageWithFallback from "./ImageWithFallback";
+import HxStrengthMeter from "./HxStrengthMeter";
 
 interface MemoryDashboardProps {
   activePin: MemoryPin | null;
@@ -284,28 +285,13 @@ export default function MemoryDashboard({
                   {activePerspective ? `"${activePerspective.text}"` : (activePin.text ? `"${activePin.text}"` : "No description written yet.")}
                 </p>
 
-                {/* Perspective Metadata Card */}
-                {activePerspective && (
-                  <div className="mt-3 p-2 bg-amber-50/50 border border-amber-200/50 rounded text-[10px] text-amber-900 font-sans space-y-1 max-w-xl shadow-sm">
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                      {activePerspective.sourceNote && (
-                        <span>
-                          <span className="font-semibold text-amber-800">📷 Source:</span> {activePerspective.sourceNote}
-                        </span>
-                      )}
-                      {activePerspective.confidence && (
-                        <span>
-                          <span className="font-semibold text-amber-800">✓ Confidence:</span> {activePerspective.confidence}
-                        </span>
-                      )}
-                      {activePerspective.hxStrength !== undefined && (
-                        <span>
-                          <span className="font-semibold text-amber-800">❤️ Nostalgia Strength:</span> {(activePerspective.hxStrength * 100).toFixed(0)}%
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
+                {/* Hx Strength Instrument Panel */}
+                <HxStrengthMeter
+                  hxStrength={activePerspective?.hxStrength}
+                  confidence={activePerspective?.confidence}
+                  sourceNote={activePerspective?.sourceNote}
+                  isBase={!activePerspective}
+                />
               </div>
 
               {/* Cassette/Audio Controller Player */}
@@ -531,13 +517,12 @@ export default function MemoryDashboard({
                         <p className="italic text-stone-700 font-serif leading-relaxed">
                           &ldquo;{activePerspective.text}&rdquo;
                         </p>
-                        <div className="text-[9px] text-stone-500 flex flex-wrap gap-x-3 gap-y-0.5">
-                          {activePerspective.sourceNote && <span>📷 Source: {activePerspective.sourceNote}</span>}
-                          {activePerspective.confidence && <span>✓ Confidence: {activePerspective.confidence}</span>}
-                          {activePerspective.hxStrength !== undefined && (
-                            <span>❤️ Nostalgia: {(activePerspective.hxStrength * 100).toFixed(0)}%</span>
-                          )}
-                        </div>
+                        <HxStrengthMeter
+                          hxStrength={activePerspective.hxStrength}
+                          confidence={activePerspective.confidence}
+                          sourceNote={activePerspective.sourceNote}
+                          isBase={false}
+                        />
                         <p className="text-[8px] text-stone-400 leading-tight">
                           *Editing is locked on this perspective preview. Modifications to coordinates or properties below will write directly to the base stop anchor.
                         </p>
