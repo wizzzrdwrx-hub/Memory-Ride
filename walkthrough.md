@@ -3,7 +3,7 @@
 ## 🎯 Purpose & Scope
 Memory Ride is a proof-of-concept for turning family photos, meaningful locations, and personal narration into a shareable guided route experience.
 
-This walkthrough outlines the complete feature stack compiled as of **v0.3 Route Demo Polish**, including multi-route libraries, Light Over Time layers, Hx Strength meters, Confidence Haptics atmosphere, and a detailed showcase script.
+This walkthrough outlines the complete feature stack compiled as of **v0.3 Demo Export Package**, including multi-route libraries, Light Over Time layers, Hx Strength meters, Confidence Haptics atmosphere, and a detailed showcase script.
 
 ---
 
@@ -29,6 +29,24 @@ This walkthrough outlines the complete feature stack compiled as of **v0.3 Route
    * **View Mode**: Clean dashboard reading narratives with dynamic haptic wrappers.
    * **Present Mode**: Read-only, presentation-friendly view hiding Creator settings, database, and import/export controls.
    * **Creator Mode**: Full access to drag markers, update titles/years, write narratives, import/export route JSONs, and back up library JSONs to/from local storage.
+
+---
+
+## 💾 Precompiled JSON Sample Verification
+We package two schema-compliant sample JSON archives mirrored in both the public assets folder (`public/demo-routes/`) and the documentation folder (`docs/demo-routes/`):
+
+1. **`sample_route.json`**: Represents a single serialized Memory Route.
+   * *Verify*: 
+     1. Open the app in **Creator Mode**.
+     2. Click **Import Route**.
+     3. Select `sample_route.json` from either directory.
+     4. Confirm a popup appears saying *"Route imported successfully!"* and the dashboard centers on "The Battery to The Beach" route with 4 active stops.
+2. **`sample_library.json`**: Represents a multi-route library wrapping the default database.
+   * *Verify*:
+     1. In **Creator Mode**, click **Import Full Library**.
+     2. Select `sample_library.json`.
+     3. Accept the confirmation modal.
+     4. Confirm that the entire local database resets and loads the Folly Beach route cleanly.
 
 ---
 
@@ -58,7 +76,7 @@ Use this script to demonstrate the engine to reviewers or stakeholders:
    * Show that all route creator controls disappear, leaving a clean, distraction-free playback window ideal for driving or sharing.
 7. **Show Portability**:
    * Exit Present Mode and point out the **Route Portability** and **Library Portability** buttons in Creator Mode.
-   * Explain that users can export their custom road-trip archives as single JSON files or backup their whole multi-route library locally.
+   * Explain that users can import/export the precompiled `sample_route.json` or `sample_library.json` files to save or share their spatial memories.
 8. **Plot a Stop**:
    * Click **Add Stop** in Creator Mode.
    * Drag the new stop marker on the map to place it, type a custom title, and show how users can build their own guided memory journey.

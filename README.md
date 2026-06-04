@@ -14,50 +14,50 @@ This demo maps a nostalgic family drive from the **Charleston Battery to Folly B
 
 ## 📋 Features
 
-* **Route-First Experience**: Memories are anchored directly to coordinates and connected dynamically via a stitched amber route on a Mapbox canvas.
-* **Light Over Time (Decade Slider)**: Focuses on a single coordinate stop (e.g. Crosby's Seafood) and navigates between different time-layered perspective nodes (1994, 2016, 2024, and 1970s) to watch the visual details, captions, and references shift.
-* **Hx Strength Meter**: An analog-style dashboard tuner dial built entirely in CSS/Tailwind representing historical integrity and confidence metrics.
-* **Confidence Haptics**: Subtle, CSS-only atmospheric visuals (soft blurs, warm pulsing glows, CRT scanlines, and paper-noise overrides) that shift to reflect how strongly a layer is supported by evidence.
-* **Dual Presentation Layouts**:
-  * **Creator Mode**: Drag stops directly on the map surface, customize coordinates, years, and descriptions, and review temporal perspectives in a dedicated locking panel.
-  * **Present Mode**: A distraction-free, read-only presentation theater featuring playback advance handles.
-* **Route & Library Portability**: Export/import a single route storyboard or compile and backing up your entire multi-route library using JSON files loaded directly from/to `localStorage`.
+* **Route Library**: Preloaded memory routes managed as a library. Swapping routes updates the active Map tracks and dashboard details instantly.
+* **Creator Mode**: Full developer options to plot/delete stops, edit metadata, coordinates, images, and audio settings. Reposition markers by dragging them directly on the Map canvas or clicking map coordinates.
+* **Present Mode**: A distraction-free, read-only presentation view. Hides all editor fields, database controls, and CRUD buttons, providing a clean guided theater flow.
+* **Route & Library Portability**: Dynamic JSON serialization. Export routes as portable `.json` files or package/backup the entire local multi-route database.
+* **Media Prep**: Metadata structures ready for offline media (URLs, local public file paths, audio duration tags, and source types) with strict validation.
+* **Light Over Time**: Time-layered perspectives anchored to a single coordinate stop (e.g. Crosby's Seafood). Navigate through different eras (1994, 2016, 2024, 1970s) to watch descriptions, photos, and references shift.
+* **Hx Strength Meter**: An analog-style dashboard instrument dial built in CSS/Tailwind representing historical integrity and confidence levels.
+* **Confidence Haptics**: Pure CSS visual filters (scanline grids, pulsing borders, sepia tints, blurs, and opacities) that shift automatically based on the selected layer's historical weight.
+
+---
+
+## 📦 Downloadable Sample JSON Routes
+To test route portability without creating data from scratch, you can use the schema-compliant sample JSON files included in this repository:
+
+1. **Sample Single Route**: [sample_route.json](file:///C:/Users/Administrator/Documents/New%2520project/memory-ride-mvp/docs/demo-routes/sample_route.json) (Mirrored at `public/demo-routes/sample_route.json`)
+   * *Contains*: The preloaded 4-stop Charleston Battery to Folly Beach route, complete with Crosby's Seafood time perspectives.
+   * *How to Import*: In **Creator Mode**, click the **Import Route** button and select this JSON file. It will load as a new route.
+2. **Sample Full Library**: [sample_library.json](file:///C:/Users/Administrator/Documents/New%2520project/memory-ride-mvp/docs/demo-routes/sample_library.json) (Mirrored at `public/demo-routes/sample_library.json`)
+   * *Contains*: A full multi-route library schema wrapping the default Folly Beach route.
+   * *How to Import*: In **Creator Mode**, click **Import Full Library** and select this file. *Warning: This will overwrite your active local storage database.*
 
 ---
 
 ## ⚙️ Local Setup
 
-1. **Prerequisites**: Make sure Node.js (v18+) is installed.
-2. **Navigate to Project**:
-   ```bash
-   cd memory-ride-mvp
-   ```
-3. **Install Dependencies**:
+1. **Install Dependencies**:
    ```bash
    npm install
    ```
-4. **Environment Setup**:
-   Copy `.env.local.example` to `.env.local`:
-   ```bash
-   cp .env.local.example .env.local
-   ```
-   Add your Mapbox Public Access Token:
+2. **Configure Environment Token**:
+   Create a `.env.local` file in the project root:
    ```env
-   NEXT_PUBLIC_MAPBOX_TOKEN=pk.your_mapbox_token_here
+   NEXT_PUBLIC_MAPBOX_TOKEN=pk.your_mapbox_public_token_here
    ```
-5. **Run Development Server**:
+   *(Ensure you use a valid public Mapbox token to load the Map canvas correctly).*
+3. **Run Local Development Server**:
    ```bash
    npm run dev
    ```
-6. **Open in Browser**: Open [http://localhost:3000](http://localhost:3000) to view the engine.
-
----
-
-## 🏗️ Production Build
-Verify compilation and Turbopack static compilation by running:
-```bash
-npm run build
-```
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+4. **Compile Production Build**:
+   ```bash
+   npm run build
+   ```
 
 ---
 
@@ -66,3 +66,4 @@ npm run build
 * **v0.1.1**: Added activePin null guards, JSON schema check, and Polaroid fallback icons.
 * **v0.2**: Added Route Library storage, Route CRUD, Import/Export, and Present Mode Foundation.
 * **v0.3**: Added Media Metadata Prep, Light Over Time layers, Hx Strength Meter, and Confidence Haptics.
+* **v0.3 Handoff**: Completed Demo Export packaging and visual audit checklist.

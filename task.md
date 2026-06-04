@@ -1,19 +1,21 @@
-# Task: v0.3 Route Demo Polish
+# Task: v0.3 Demo Export Package
 
-- [x] Polish default route and stop copy:
-  - [x] Enrich stop 1, 2, 3, and 4 narratives in `mockData.ts` to be warm and nostalgic.
-  - [x] Refine Crosby's Seafood Light Over Time layer text.
-- [x] Present Mode polish:
-  - [x] Hide Creator Mode buttons ("Add First Stop" and "Reset Demo") in empty Present Mode dashboard.
-  - [x] Render clean read-only informational banner in Present Mode if route is empty.
-- [x] UI terminology alignment:
-  - [x] Rename time-layer pill headers to "Light Over Time:".
-  - [x] Rename creator mode preview selectors to "Light Over Time Preview:".
-  - [x] Change HxStrengthMeter title copy to "Hx Strength Meter".
-  - [x] Align floating mode buttons to "View Mode", "Creator Mode", and "Present Mode".
-- [x] Documentation updates:
-  - [x] Remove outdated, redundant bottom lines inside `README.md`.
-  - [x] Update `walkthrough.md` with complete v0.3 features and showcase script.
+- [x] Create public demo route assets:
+  - [x] Generate `public/demo-routes/sample_route.json` via node script.
+  - [x] Generate `public/demo-routes/sample_library.json` via node script.
+  - [x] Ensure files are mirrored inside the `docs/demo-routes/` folder.
+  - [x] Validate both JSON files against schemas.
+  - [x] Confirm no Mapbox tokens or secrets are contained in exported JSONs.
+- [x] Add handoff documents:
+  - [x] Create `docs/demo-brief.md` (Product summary, differentiators, stack, roadmap).
+  - [x] Create `docs/screenshots-checklist.md` (Checklist of visual states and dials).
+- [x] Update README.md:
+  - [x] Document the mirrored downloadable JSON exports.
+  - [x] Write step-by-step guidelines for importing routes/libraries.
+  - [x] Document v0.3 feature stack (Light Over Time, Hx Strength, Haptics).
+- [x] Update walkthrough.md:
+  - [x] Document verification guidelines for imports/exports.
+  - [x] Review demo script sequence.
 - [x] Verification:
   - [x] Run `cmd /c npm run lint`
   - [x] Run `cmd /c npm run build`
