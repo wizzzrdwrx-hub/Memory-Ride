@@ -250,22 +250,28 @@ export default function MemoryDashboard({
           !activePin ? (
             <div className="w-full h-full flex flex-col items-center justify-center p-6 text-stone-600 font-serif">
               <p className="text-center italic mb-4">No stops in this memory ride yet.</p>
-              <div className="flex space-x-3">
-                <button
-                  onClick={onAddPin}
-                  className="flex items-center px-4 py-2 bg-amber-700 text-stone-50 text-xs font-sans font-bold uppercase tracking-wider rounded hover:bg-amber-800 transition-colors shadow"
-                >
-                  <Plus className="w-4 h-4 mr-1.5" />
-                  Add First Stop
-                </button>
-                <button
-                  onClick={onResetDemo}
-                  className="flex items-center px-4 py-2 border border-stone-300 text-stone-700 text-xs font-sans font-bold uppercase tracking-wider rounded hover:bg-stone-100 transition-colors"
-                >
-                  <RotateCcw className="w-4 h-4 mr-1.5" />
-                  Reset Demo
-                </button>
-              </div>
+              {mode !== "present" ? (
+                <div className="flex space-x-3">
+                  <button
+                    onClick={onAddPin}
+                    className="flex items-center px-4 py-2 bg-amber-700 text-stone-50 text-xs font-sans font-bold uppercase tracking-wider rounded hover:bg-amber-800 transition-colors shadow"
+                  >
+                    <Plus className="w-4 h-4 mr-1.5" />
+                    Add First Stop
+                  </button>
+                  <button
+                    onClick={onResetDemo}
+                    className="flex items-center px-4 py-2 border border-stone-300 text-stone-700 text-xs font-sans font-bold uppercase tracking-wider rounded hover:bg-stone-100 transition-colors"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-1.5" />
+                    Reset Demo
+                  </button>
+                </div>
+              ) : (
+                <p className="text-xs font-sans text-stone-400">
+                  This memory route is currently empty. Switch to Creator Mode to plot your first stop.
+                </p>
+              )}
             </div>
           ) : (
             <>
@@ -274,7 +280,7 @@ export default function MemoryDashboard({
                 {activePin.temporalPerspectives && activePin.temporalPerspectives.length > 0 && (
                   <div className="flex flex-wrap items-center gap-2 mb-3 font-sans">
                     <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400 mr-1">
-                      Time Layer:
+                      Light Over Time:
                     </span>
                     <button
                       onClick={() => onSelectPerspective(null)}
@@ -518,7 +524,7 @@ export default function MemoryDashboard({
                     {activePin.temporalPerspectives && activePin.temporalPerspectives.length > 0 && (
                       <div className="flex flex-wrap items-center gap-2 mb-2 font-sans">
                         <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400 mr-1">
-                          Preview Perspective:
+                          Light Over Time Preview:
                         </span>
                         <button
                           onClick={() => onSelectPerspective(null)}
@@ -537,7 +543,7 @@ export default function MemoryDashboard({
                             className={`px-2.5 py-0.5 text-[9px] font-sans font-bold uppercase tracking-wider rounded-full border transition-all ${
                               selectedPerspectiveId === tp.id
                                 ? "bg-amber-700 border-amber-700 text-stone-50 shadow-sm"
-                                : "bg-white border-stone-200 text-stone-600 hover:text-stone-850 hover:bg-stone-100"
+                               : "bg-white border-stone-200 text-stone-600 hover:text-stone-850 hover:bg-stone-100"
                             }`}
                             title={tp.label}
                           >
@@ -564,7 +570,7 @@ export default function MemoryDashboard({
                       return (
                         <div className={`p-2.5 border rounded space-y-1.5 text-[10px] font-sans mb-2 shadow-sm transition-all duration-500 ${cardBgClass}`}>
                           <div className={`font-bold flex items-center ${cardHeaderClass}`}>
-                            <span className="mr-1">👁️</span> Perspective Review Card: {activePerspective.title} ({activePerspective.year})
+                            <span className="mr-1">👁️</span> Light Over Time Layer Review: {activePerspective.title} ({activePerspective.year})
                           </div>
                           <p className="italic text-stone-700 font-serif leading-relaxed">
                             &ldquo;{activePerspective.text}&rdquo;
@@ -576,7 +582,7 @@ export default function MemoryDashboard({
                             isBase={false}
                           />
                           <p className="text-[8px] text-stone-400 leading-tight">
-                            *Editing is locked on this perspective preview. Modifications to coordinates or properties below will write directly to the base stop anchor.
+                            *Editing is locked on this Light Over Time layer preview. Modifications to coordinates or properties below will write directly to the base stop anchor.
                           </p>
                         </div>
                       );

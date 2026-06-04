@@ -419,27 +419,27 @@ export default function Home() {
                 className={`flex-1 text-center py-1.5 px-3 rounded text-[10px] uppercase tracking-wider font-sans font-bold transition-all shadow-sm ${
                   mode === "view"
                     ? "bg-amber-700 text-stone-50"
-                    : "bg-stone-200/60 text-stone-600 hover:text-stone-800 hover:bg-stone-200"
+                    : "bg-stone-200/60 text-stone-600 hover:text-stone-850 hover:bg-stone-200"
                 }`}
               >
-                View Story
+                View Mode
               </button>
               <button
                 onClick={() => setMode("edit")}
                 className={`flex-1 text-center py-1.5 px-3 rounded text-[10px] uppercase tracking-wider font-sans font-bold transition-all shadow-sm ${
                   mode === "edit"
                     ? "bg-amber-700 text-stone-50"
-                    : "bg-stone-200/60 text-stone-600 hover:text-stone-800 hover:bg-stone-200"
+                    : "bg-stone-200/60 text-stone-600 hover:text-stone-850 hover:bg-stone-200"
                 }`}
               >
                 Creator Mode
               </button>
               <button
                 onClick={() => setMode("present")}
-                className="flex-1 text-center py-1.5 px-3 rounded text-[10px] uppercase tracking-wider font-sans font-bold transition-all shadow-sm bg-stone-200/60 text-stone-600 hover:text-stone-800 hover:bg-stone-200"
+                className="flex-1 text-center py-1.5 px-3 rounded text-[10px] uppercase tracking-wider font-sans font-bold transition-all shadow-sm bg-stone-200/60 text-stone-600 hover:text-stone-850 hover:bg-stone-200"
                 title="Enter Present Mode"
               >
-                Present
+                Present Mode
               </button>
             </div>
           ) : (

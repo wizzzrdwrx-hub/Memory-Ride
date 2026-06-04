@@ -1,55 +1,64 @@
-# Walkthrough: Memory Ride MVP (Project Opal) - v0.3 Confidence Haptics Foundation
+# Walkthrough: Memory Ride MVP (Project Opal) - v0.3 Complete
 
-## 🎯 MVP Purpose
-Memory Ride is a proof-of-concept for turning family photos, meaningful locations, and personal narration into a shareable guided route experience. 
+## 🎯 Purpose & Scope
+Memory Ride is a proof-of-concept for turning family photos, meaningful locations, and personal narration into a shareable guided route experience.
 
-This slice introduces **v0.3 Confidence Haptics Foundation**, which visually degrades or sharpens Polaroid photos and dashboard review cards depending on the historical integrity and reconstruction confidence (`hxStrength`) of active time-layers.
-
----
-
-## 🛠️ File Structure
-The project is structured inside the `memory-ride-mvp/` folder as follows:
-
-- [package.json](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/package.json) - Contains React 19, Next.js 16, `@types/mapbox-gl`, `react-map-gl`, and `lucide-react`.
-- [globals.css](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/globals.css) - [MODIFY] Added visual scanline gradients for Medium and Low Hx, pulse animations for amber and red glow borders, and prefers-reduced-motion media query overrides.
-- [HxStrengthMeter.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/components/HxStrengthMeter.tsx) - [MODIFY] Derived `hapticState` internally, styled the outer chassis borders/inner shadows matching the tier, and added a microcopy disclaimer.
-- [MemoryDashboard.tsx](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/components/MemoryDashboard.tsx) - [MODIFY] Computed the haptic state at the top level and dynamically applied CSS classes/filters/overlays to the Polaroid frame wrapper, inner photo container, image elements, and Creator Mode Perspective review card.
-- [mockData.ts](file:///c:/Users/Administrator/Documents/New%20project/memory-ride-mvp/app/data/mockData.ts) - [MODIFY] Inserted a fourth Crosby's Seafood temporal perspective (1970s Hearsay) with a low `hxStrength` (0.48) to demonstrate the Low Hx haptic state.
+This walkthrough outlines the complete feature stack compiled as of **v0.3 Route Demo Polish**, including multi-route libraries, Light Over Time layers, Hx Strength meters, Confidence Haptics atmosphere, and a detailed showcase script.
 
 ---
 
-## 📋 Current MVP Scope (v0.3 Confidence Haptics Complete)
-* **Confidence Haptics Thresholds**:
-  * **Neutral** (Base Stop): Clear image, no degradation, instrument shows N/A, tube warmup indicator remains dark.
-  * **High Hx** (`hxStrength >= 0.85`, e.g. 2024 at 92%): Emerald highlighted outline wrapper, sharp grayscale-0 image.
-  * **Medium Hx** (`0.60 <= hxStrength < 0.85`, e.g. 2016 at 84%, 1994 at 72%): Pulsing amber glow border around the Polaroid, mild image softness (`blur-[0.3px]`, `contrast-[98%]`), and fine-grain amber scanlines.
-  * **Low Hx** (`hxStrength < 0.60`, e.g. 1970 at 48%): Faint red pulsing glow border, pronounced image blur (`blur-[0.8px]`), sepia fade mix (`sepia-[15%]`), reduced opacity, and paper-noise scanline overlay representing temporal decay.
-* **UI copy**:
-  * Added the following warning label to the Hx Strength Meter footer:
-    > "✦ Confidence Haptics use subtle visual atmosphere to show how strongly this time-layer is supported."
-* **Accessibility & Usability Safeguards**:
-  * Visual effects apply strictly to image containers and background frames; no blur or opacity changes affect narrative text blocks.
-  * Animation pulses check for user preferences via `@media (prefers-reduced-motion: reduce)` to disable layout transitions if necessary.
-  * Avoided any strobe, flicker, or high-frequency animations.
+## 🛠️ Complete Feature Stack (v0.3)
+1. **Interactive Mapbox Canvas**:
+   * Stitched, nostalgic dashed-line amber route connects chronological stops.
+   * Auto-fly logic centers and zooms active stops.
+   * Markers render inside physical custom Polaroid frames.
+   * Edit Mode allows re-routing paths via marker dragging or clicking map surfaces.
+2. **Light Over Time (Decade Switcher)**:
+   * Stop 3 (Crosby's Seafood) holds time-layered perspectives (1994, 2016, 2024, and 1970s).
+   * Shifting years updates descriptions, metadata, and photos, leaving location coordinates static.
+3. **Hx Strength Meter**:
+   * Custom CSS/HTML tuner chassis representing historical integrity percentage (e.g. 72%, 84%, 92%, 48%).
+   * Smooth white dial needle sliding transitions.
+   * Pulsing amber TUBE WARMUP neon glow (active when perspective is selected; dark in base stop).
+4. **Confidence Haptics**:
+   * **High Hx** (`hxStrength >= 0.85`): Emerald glowing frame border, sharp grayscale-0 photo display.
+   * **Medium Hx** (`0.60 <= hxStrength < 0.85`): Pulsing amber glow, mild image softness (`blur-[0.3px]`), and fine amber scanlines.
+   * **Low Hx** (`hxStrength < 0.60`): Pulsing red/orange glow, heavy image blur (`blur-[0.8px]`), sepia tint overlay (`sepia-[15%]`), and paper-noise scanline overlay representing signal decay.
+   * **Neutral/Base**: Standard view, pointer needle hidden, tube light dark, showing "Base Memory / N/A".
+5. **Mode Panels & Portability**:
+   * **View Mode**: Clean dashboard reading narratives with dynamic haptic wrappers.
+   * **Present Mode**: Read-only, presentation-friendly view hiding Creator settings, database, and import/export controls.
+   * **Creator Mode**: Full access to drag markers, update titles/years, write narratives, import/export route JSONs, and back up library JSONs to/from local storage.
 
 ---
 
-## 🚀 Build & Lint Status
-- **ESLint**: Completed successfully with 0 errors (standard native image warnings in fallback elements only).
-- **Production Build**: Compiled successfully in Turbopack (`next build`) in ~23s with zero TypeScript compilation errors or static generation issues.
+## 🎙️ Suggested Demo Showcase Script
+Use this script to demonstrate the engine to reviewers or stakeholders:
 
----
-
-## ✅ QA Checklist
-
-- [x] Base Stop shows neutral haptic state (sharp image, dark tube light, N/A meter).
-- [x] Crosby’s 1994 layer (`hxStrength` = 0.72) displays Medium haptic state (amber pulsing outline, scanlines, blur 0.3px).
-- [x] Crosby’s 2016 layer (`hxStrength` = 0.84) displays Medium haptic state.
-- [x] Crosby’s 2024 layer (`hxStrength` = 0.92) displays High haptic state (emerald highlighted outline, sharp photo).
-- [x] Crosby's 1970 layer (`hxStrength` = 0.48) displays Low haptic state (red outline, blur 0.8px, sepia tone, paper noise overlay).
-- [x] Text elements remain sharp and readable across all views.
-- [x] Changing perspective tabs updates visual haptic elements instantly.
-- [x] Changing active stop resets selected perspective to base memory.
-- [x] View, Present, and Creator modes function normally.
-- [x] `cmd /c npm run lint` passes.
-- [x] `cmd /c npm run build` passes.
+1. **Setup**: Start on the home screen. Make sure the Charleston Battery demo is loaded.
+2. **Explain the Vision**: 
+   * *“This is Memory Ride. Instead of organizing family history chronologically in directories, we organize it spatially as a guided driving simulator.”*
+3. **Show the Route**: 
+   * Click through the stops (leaving the Battery, crossing the Expressway) using the tape player playback arrows. Explain the nostalgic scrapbook layout.
+4. **Demonstrate Light Over Time**:
+   * Select Stop 3: **Crosby's Seafood**.
+   * Click the year pills to switch layers:
+     * **1994** (Family road trip memory): Shows the original nostalgic snapshot.
+     * **2016** (Recent memory layer): Watch the image update to a newer reference view.
+     * **2024** (Current-day reference): Visual updates to the modern view.
+     * **1970s** (Family hearsay lore): Shows the faded legend of Uncle Robert's ghost boat.
+5. **Explain Hx Strength & Confidence Haptics**:
+   * Focus on the **Hx Strength Meter** under the narration:
+     * Explain that `92%` (2024) is a direct, verified current reference (High Hx, sharp photo, emerald border).
+     * Explain that `72%` (1994) represents personal memories supported by photos (Medium Hx, pulsing amber outline, slight scanline grain).
+     * Explain that `48%` (1970s) is unverified family lore (Low Hx, pulsing red border, sepia fade, blurred memory decay).
+     * Show that the text remains sharp and highly readable regardless of haptic decay.
+6. **Enter Present Mode**:
+   * Click **Present Mode** in the header toggle.
+   * Show that all route creator controls disappear, leaving a clean, distraction-free playback window ideal for driving or sharing.
+7. **Show Portability**:
+   * Exit Present Mode and point out the **Route Portability** and **Library Portability** buttons in Creator Mode.
+   * Explain that users can export their custom road-trip archives as single JSON files or backup their whole multi-route library locally.
+8. **Plot a Stop**:
+   * Click **Add Stop** in Creator Mode.
+   * Drag the new stop marker on the map to place it, type a custom title, and show how users can build their own guided memory journey.

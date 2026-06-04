@@ -62,7 +62,7 @@ export default function HxStrengthMeter({
 
       {/* Header Tuning Banner */}
       <div className="flex items-center justify-between text-[8px] uppercase tracking-widest text-stone-500 font-bold mb-2.5">
-        <span>Hx Integrity Tuning Meter</span>
+        <span>Hx Strength Meter</span>
         <div className="flex items-center space-x-1">
           <span>TUBE WARMUP</span>
           <span className={`h-1.5 w-1.5 rounded-full border border-amber-600/40 shadow-[0_0_6px_#f59e0b] ${

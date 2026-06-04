@@ -1,79 +1,60 @@
-# Memory Ride MVP
-
+# Memory Ride MVP (Project Opal) 🚗⏱️
 > The next evolution of the family photo album
 
-Memory Ride turns meaningful routes, photos, captions, and personal stories into an interactive guided memory route. 
+Memory Ride turns meaningful locations, photos, narration, and personal stories into an interactive guided memory route. Relive journeys chronologically and spatially, exploring how places change over time.
 
 ---
 
-## 🎯 MVP Purpose
-Memory Ride is a proof-of-concept for turning family photos, meaningful locations, and personal narration into a shareable guided route experience.
+## 🎯 Purpose & Vision
+Memory Ride is a proof-of-concept for converting traditional family photo albums and cassette tape audio memories into a dynamic driving simulator. By anchoring photos and personal memories to coordinates on a Mapbox canvas, we preserve **emotional geography** rather than just media files.
 
-This demo uses a Charleston-to-Folly route to show how old memories can be organized spatially, presented visually, and replayed like a modern interactive family photo album.
-
----
-
-## 📋 Current MVP Scope
-* **Charleston-to-Folly Demo Route**: Preloaded road trip from the Charleston Battery to Center Street (1994).
-* **Dynamic Memory Pins**: Interactive stops along the road with photo representations.
-* **View/Edit Creator Mode**: Dual modes to consume memory playbacks or edit paths.
-* **Polaroid-style Memory Cards**: Retro physical frames displaying visual memories in real-time.
-* **Mapbox Route Visualization**: Dynamically connecting paths with customized dashed-road styling.
-* **Draggable/Repositionable Stops**: Relocate pins by dragging them on the map canvas or clicking any coordinate point.
-* **localStorage Route Persistence**: Cache your custom edits automatically.
-* **JSON Import/Export**: Export routes as portable `.json` files or import existing layouts.
-* **Safe Mapbox Token Handling**: Environment config variables via `.env.local` to prevent source leaks.
+This demo maps a nostalgic family drive from the **Charleston Battery to Folly Beach, SC**, using historical references and time-layered memories.
 
 ---
 
-## 🛡️ Stability Features Added (v0.1.1)
-* **Safe activePin Null Guard**: Intercepts map rendering and panel states to prevent page crashes if all pins are deleted, or when files are imported/reset.
-* **JSON Schema Verification**: Parses uploaded JSON objects and checks data structure and type mappings for all keys before committing to state.
-* **Polaroid Image Fallbacks**: Gracefully degrades broken, empty, or unresolvable URLs to a styled preview card with an `ImageOff` icon.
-* **localStorage Migrations**: Migrates legacy v0.1 flat array formats to standard versioned route structures automatically on boot.
+## 📋 Features
 
----
-
-## 🛑 Not Yet Included (Future Targets)
-* Cloud accounts / centralized hosting
-* Hosted image upload integration
-* Multi-route libraries
-* Microphone narration recordings
-* Public sharing link generation
-* Multiplayer co-op riding
-* VR mode
+* **Route-First Experience**: Memories are anchored directly to coordinates and connected dynamically via a stitched amber route on a Mapbox canvas.
+* **Light Over Time (Decade Slider)**: Focuses on a single coordinate stop (e.g. Crosby's Seafood) and navigates between different time-layered perspective nodes (1994, 2016, 2024, and 1970s) to watch the visual details, captions, and references shift.
+* **Hx Strength Meter**: An analog-style dashboard tuner dial built entirely in CSS/Tailwind representing historical integrity and confidence metrics.
+* **Confidence Haptics**: Subtle, CSS-only atmospheric visuals (soft blurs, warm pulsing glows, CRT scanlines, and paper-noise overrides) that shift to reflect how strongly a layer is supported by evidence.
+* **Dual Presentation Layouts**:
+  * **Creator Mode**: Drag stops directly on the map surface, customize coordinates, years, and descriptions, and review temporal perspectives in a dedicated locking panel.
+  * **Present Mode**: A distraction-free, read-only presentation theater featuring playback advance handles.
+* **Route & Library Portability**: Export/import a single route storyboard or compile and backing up your entire multi-route library using JSON files loaded directly from/to `localStorage`.
 
 ---
 
 ## ⚙️ Local Setup
 
-1. Clone or download this project workspace.
-2. Navigate to the project root:
+1. **Prerequisites**: Make sure Node.js (v18+) is installed.
+2. **Navigate to Project**:
    ```bash
    cd memory-ride-mvp
    ```
-3. Install the dependencies:
+3. **Install Dependencies**:
    ```bash
    npm install
    ```
-4. Copy the sample environment file to create `.env.local`:
+4. **Environment Setup**:
+   Copy `.env.local.example` to `.env.local`:
    ```bash
    cp .env.local.example .env.local
    ```
-5. Open `.env.local` and add your Mapbox Public Access Token:
+   Add your Mapbox Public Access Token:
    ```env
-   NEXT_PUBLIC_MAPBOX_TOKEN=pk.your_mapbox_public_token_here
+   NEXT_PUBLIC_MAPBOX_TOKEN=pk.your_mapbox_token_here
    ```
-6. Run the local development server:
+5. **Run Development Server**:
    ```bash
    npm run dev
    ```
-7. Open [http://localhost:3000](http://localhost:3000) in your browser.
+6. **Open in Browser**: Open [http://localhost:3000](http://localhost:3000) to view the engine.
 
 ---
 
 ## 🏗️ Production Build
-To test the production build locally:
+Verify compilation and Turbopack static compilation by running:
 ```bash
 npm run build
 ```
@@ -81,21 +62,7 @@ npm run build
 ---
 
 ## 🚀 Technical Milestones
-* **Current Status**: Creator Mode v0.1 complete and build-verified.
-* **Next Target**: Creator Mode v0.1.1 stability polish (improved schema validation and UI fallback cards) followed by Creator Mode v0.2.
-# Memory-Ride (Project Opal) 🚗⏱️
-**The Route-First Memory Engine & Driving Simulator**
-
-## Overview
-Memory-Ride (formerly PastCast) is an audio-first, location-aware driving companion MVP. It utilizes GPS to narrate historical context, allowing users to create, share, and experience interactive, route-based memory albums. We preserve emotional geography, not just media files.
-
-## Core Features (MVP)
-* **Route-First Paradigm:** Memories are anchored to coordinates and paths, not dates.
-* **The Decade Slider:** Temporal navigation to shift the audio narrative through different eras of a location's history.
-* **AntiGravity + NotebookLM Workflow:** Ingests raw family stories, historical data, and route coordinates to generate fluid, conversational audio narration.
-
-## Current Status
-* [x] Creator Profile MVP established
-* [x] Proof-of-Route Prototype scoped
-* [ ] GPS-to-Audio trigger logic
-* [ ] Database schema for emotional geography nodes
+* **v0.1**: Creator Profile and basic Proof-of-Route established.
+* **v0.1.1**: Added activePin null guards, JSON schema check, and Polaroid fallback icons.
+* **v0.2**: Added Route Library storage, Route CRUD, Import/Export, and Present Mode Foundation.
+* **v0.3**: Added Media Metadata Prep, Light Over Time layers, Hx Strength Meter, and Confidence Haptics.
